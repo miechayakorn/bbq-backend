@@ -6,10 +6,12 @@ const Schema = use('Schema')
 class UserSchema extends Schema {
   up () {
     this.create('users', (table) => {
-      table.increments()
-      table.string('username', 80).notNullable().unique()
-      table.string('email', 254).notNullable().unique()
-      table.string('password', 60).notNullable()
+      table.increments('user_id').primary() //  [PK,FK]
+      table.string('gender', 10).notNullable() //[CK]
+      table.string('date_of_birth', 10).notNullable() //[NN]
+      table.string('drug_allergy', 10)
+      table.string('congenital_disorder', 10)
+      
       table.timestamps()
     })
   }
