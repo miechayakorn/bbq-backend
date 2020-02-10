@@ -16,10 +16,30 @@ table.string('title', 10).notNullable().unique()
 ```
 adonis migration:run
 ```
---- 
+### --- คำสั่งจำเป็น
+รันโหมด Dev
+```
+adonis serve --dev
+```
+### สร้าง
+- model
 ```
 adonis make:model .....
 ```
+- controller
 ```
 adonis make:controller .....
 ```
+### Migration
+
+```
+adonis migration:status
+```
+```
+adonis migration:run
+```
+```
+adonis migration:rollback
+```
+
+
