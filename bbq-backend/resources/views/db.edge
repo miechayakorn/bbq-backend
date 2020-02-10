@@ -1,0 +1,30 @@
+@layout('layouts.application') 
+
+@section('title')
+<title>Hello Adonis</title>
+@endsection
+
+@section('content')
+<section>
+  @each(user in users)
+  {{ user.user_id }} <br />
+  {{ user.gender }} <br />
+  {{ user.date_of_birth }} <br />
+  {{ user.drug_allergy }} <br />
+  {{ user.congenital_disorder }} <br />
+  {{ user.created_at }} <br />
+  {{ user.updated_at }} <br />
+  <hr>
+  @endeach
+</section>
+@endsection
+
+<!-- {
+  "user_id": 1,
+  "gender": "male",
+  "date_of_birth": "16:56:27",
+  "drug_allergy": "-",
+  "congenital_disorder": "-",
+  "created_at": null,
+  "updated_at": null
+}, -->
