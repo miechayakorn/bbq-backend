@@ -18,13 +18,15 @@ const Database = use('Database')
 const Route = use('Route')
 
 Route.on('/').render('welcome')
+
 Route.post('users', 'UserController.store')
+
 Route.get('user2', async ({view}) => {
     const data = {
         users : []
     }
     data.users = await Database.table('users').select('*')
-    // return await Database.table('users').select('*')
-    //console.log(data)
     return view.render('db', data)
 })
+
+
