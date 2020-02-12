@@ -29,8 +29,4 @@ Route.get('user2', async ({view}) => {
     // return view.render('db', data)
 })
 Route.get('user', 'UserInfoController.store')
-
-/*
-Route.get('posts/:id', ({ params }) => {
-    return `${params.id}`
-})*/
+Route.post('/users/:id/edit', 'UserController.edit')
