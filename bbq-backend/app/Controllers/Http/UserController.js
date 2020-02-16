@@ -15,6 +15,11 @@ class UserController {
       return response.status(err.status).send(err);
     }
   }
+
+  edit({ params, request }) {
+    console.log("userid = ", params.id, "param", request.only(["name"]));
+    return params;
+  }
 }
 
 module.exports = UserController;

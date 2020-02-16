@@ -25,8 +25,18 @@ Route.get('user2', async ({view}) => {
     const data = {
         users : []
     }
+<<<<<<< HEAD
     data.users = await Database.table('users').select('*')
     return view.render('db', data)
 })
 
 
+=======
+    // data.users = await Database.table('users').select('*')
+    return await Database.table('users').select('*')
+    console.log(data)
+    // return view.render('db', data)
+})
+Route.get('user', 'UserInfoController.store')
+Route.post('/users/:id/edit', 'UserController.edit')
+>>>>>>> testing

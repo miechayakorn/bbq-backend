@@ -7,7 +7,7 @@ class AccountSchema extends Schema {
   up () {
     this.create('accounts', (table) => {
       
-      table.string('user_id', 10).primary()
+      table.increments('user_id').primary() //  [PK,FK]
       table.string('password', 60).notNullable()
       table.string('hn_number', 20).notNullable().unique() // [UQ,NN]
       table.boolean('verify').defaultTo(false) //[T,F]
