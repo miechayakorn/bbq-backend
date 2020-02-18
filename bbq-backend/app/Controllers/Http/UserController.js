@@ -1,27 +1,30 @@
 "use strict";
 
 class UserController {
-  async store({ request, response }) {
+  async create({ request, response }) {
     try {
-      // getting data passed within the request
-      const data = request.only(["username", "email", "password"]);
-
-      console.log(data);
-
-      /*// looking for user in database
+      const data = request.only([
+        "first_name",
+        "last_name",
+        "email",
+        "password",
+        "telephone",
+        "gender",
+        "date_of_birth",
+        "hn_number",
+        "priviledge"
+      ]);
       const userExists = await User.findBy("email", data.email);
-
-      // if user exists don't save
       if (userExists) {
         return response
           .status(400)
           .send({ message: { error: "User already registered" } });
       }
 
-      // if user doesn't exist, proceeds with saving him in DB
       const user = await User.create(data);
+      const account = await Account.create(data);
 
-      return user;*/
+      return user;
     } catch (err) {
       return response.status(err.status).send(err);
     }
