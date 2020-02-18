@@ -14,17 +14,35 @@ class UserController {
         "hn_number",
         "priviledge"
       ]);
-      const userExists = await User.findBy("email", data.email);
+
+      /*const userExists = await User.findBy("email", data.email);
       if (userExists) {
         return response
           .status(400)
           .send({ message: { error: "User already registered" } });
+      }*/
+
+      const dataUser = {
+        gender : data.gender,
+        date_of_birth : data.date_of_birth
       }
+      const dataAccount = {
+        password : data.password,
+        hn_number : data.hn_number,
+        first_name : data.first_name,
+        last_name : data.last_name,
+        priviledge : data.priviledge,
+        email : data.email,
+        telephone : data.telephone
+      }
+      console.log(dataUser)
+      console.log(dataAccount)
+      
+      /*
+      const user = await User.create(dataUser);
+      const account = await Account.create(dataAccount);*/
 
-      const user = await User.create(data);
-      const account = await Account.create(data);
-
-      return user;
+      return data;
     } catch (err) {
       return response.status(err.status).send(err);
     }
