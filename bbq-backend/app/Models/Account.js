@@ -14,6 +14,10 @@ class Account extends Model {
       }
     });
   }
+
+  user(){
+      return this.hasOne("App/Models/User")
+  }
 }
 
 module.exports = Account;
