@@ -9,7 +9,6 @@ class WorkTimeSchema extends Schema {
       table.increments('working_id').primary()
       table.integer('day_id') //.notNullable() [FK]
       table.integer('type_id') //.notNullable() [FK]
-
       table.timestamps()
     })
   }

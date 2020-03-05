@@ -11,8 +11,8 @@
 */
 
 /** @type {import('@adonisjs/lucid/src/Factory')} */
-const Factory = use('Factory')
-const Database = use('Database')
+//const Factory = use('Factory')
+//const Database = use('Database')
 const Day = use('App/models/Day')
 const days = ['MON','TUE','WED','THU','FRI']
 
