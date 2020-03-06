@@ -1,4 +1,5 @@
 "use strict";
+const User = use("App/Models/User");
 
 class UserController {
   async store({ request, response }) {
@@ -22,6 +23,23 @@ class UserController {
       const user = await User.create(data);
 
       return user;*/
+    } catch (err) {
+      return response.status(err.status).send(err);
+    }
+  }
+  async create({ request, response }) {
+    try {
+      const data = request.only([
+        "gender",
+        "date_of_birth",
+        "first_name",
+        "last_name"
+      ]);
+      console.log("User")
+
+      console.log(userFromFontend);
+      const user = await User.create("");
+      return user;
     } catch (err) {
       return response.status(err.status).send(err);
     }

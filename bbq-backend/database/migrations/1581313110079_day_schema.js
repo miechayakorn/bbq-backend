@@ -8,7 +8,6 @@ class DaySchema extends Schema {
     this.create('days', (table) => {
       table.increments('day_id').primary() //PK
       table.string('day', 10)
-      
       table.timestamps()
     })
   }

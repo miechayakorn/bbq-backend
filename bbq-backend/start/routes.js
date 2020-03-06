@@ -17,4 +17,6 @@
 const Route = use('Route')
 
 Route.on('/').render('welcome')
-Route.post('users', 'UserController.store')
+//Route.post('users', 'UserController.store')
+Route.post('register', 'RegisterController.create')
+Route.post('register', 'UserController.create')
