@@ -11,7 +11,7 @@ class TypeSchema extends Schema {
       table.integer('time_slot').notNullable()
       table.time('start_time').notNullable()
       table.time('end_time').notNullable()
-      table.integer('creator_id')
+      table.integer('creator_id')//FK Refer to staff(doctor)
       
       table.timestamps()
     })

@@ -31,24 +31,21 @@ class RegisterController {
         date_of_birth: data.date_of_birth,
         first_name: data.first_name,
         last_name: data.last_name,
-        account_id : account.$attributes.id
+        account_id: account.$attributes.id
       });
-      console.log(account)
-      console.log("------------------------------------------------------------------")
-      console.log(user)
+      console.log(account);
+      console.log(
+        "------------------------------------------------------------------"
+      );
+      console.log(user);
 
-      await Database.table('accounts').where('account_id',account.$attributes.id).update('user_id',user.$attributes.id )
+      await Database.table("accounts")
+        .where("account_id", account.$attributes.id)
+        .update("user_id", user.$attributes.id); // update foreign key to account
 
       console.log(account);
-
-      //   console.log(accountFromFontend);
-      //   const account = await Account.create(data);
-
-      //   console.log(userFromFontend);
-      //   const user = await User.create("");
-      //   return user;
     } catch (err) {
-      return response.status(err.status).send(err);
+      return response.status(err.status).send(err); //sent error message
     }
   }
 }

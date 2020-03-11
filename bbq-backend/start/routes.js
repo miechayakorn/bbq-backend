@@ -1,4 +1,4 @@
-'use strict'
+"use strict";
 
 /*
 |--------------------------------------------------------------------------
@@ -14,9 +14,16 @@
 */
 
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
-const Route = use('Route')
+const Route = use("Route");
+const Database = use("Database");
 
-Route.on('/').render('welcome')
+Route.on("/").render("welcome");
 //Route.post('users', 'UserController.store')
-Route.post('register', 'RegisterController.create')
-Route.post('register', 'UserController.create')
+Route.post("register", "RegisterController.create");
+Route.get("showaccount", async () => {
+  let user = await Database.table("accounts").select();
+  return user;
+});
+//Route.post('register', 'UserController.create')
+
+Route.post("createtype", "CreateTypeController.create");

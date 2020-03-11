@@ -4,12 +4,12 @@
 const Model = use("Model");
 
 class WorkTime extends Model {
-  Day() {
-    return this.belongsToMany("App/Models/Day").pivotTable("work_times");
-  }
-  Type() {
-    return this.belongsToMany("App/Models/Type").pivotTable("work_times");
-  }
+  // Day() {
+  //   return this.belongsToMany("App/Models/Day").pivotTable("work_times");
+  // }
+  // Type() {
+  //   return this.belongsToMany("App/Models/Type").pivotTable("work_times");
+  // }
 }
 
 module.exports = WorkTime;
