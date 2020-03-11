@@ -27,3 +27,4 @@ Route.get("showaccount", async () => {
 //Route.post('register', 'UserController.create')
 
 Route.post("createtype", "CreateTypeController.create");
+Route.post("updatetype", "CreateTypeController.update");

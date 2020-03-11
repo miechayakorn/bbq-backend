@@ -1,5 +1,6 @@
 "use strict";
 const Type = use("App/Models/Type");
+const Database = use("Database");
 
 class CreateTypeController {
   async create({ request, response }) {
@@ -17,7 +18,24 @@ class CreateTypeController {
       return response.status(error.status).send(error);
     }
   }
-  async update({ request, response }) {}
+  async update({ request, response }) {
+    const data = await request.only([
+      "type_id",
+      "time_slot",
+      "start_time",
+      "end_time",
+      "creator_id"
+    ]);
+    console.log(data);
+    const updateType = await Database.table("types")
+      .where("type_id", data.type_id)
+      .update({
+        time_slot: data.time_slot,
+        start_time: data.start_time,
+        end_time: data.end_time,
+        creator_id: data.creator_id
+      });
+  }
 }
 
 module.exports = CreateTypeController;
