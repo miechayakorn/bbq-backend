@@ -27,7 +27,15 @@ class BookingController {
 //array : [{type_id:1,date:2020-03-20},{type_id:1,date:2020-03-20,{type_id:1,date:2020-03-20},{type_id:1,date:2020-03-20}}]
 
   async sendbooking({ request, response, params }) {
-    // let allBooking = await Booking.findBy("type_id", params.type_id);
+    let allBooking = await Database.table("bookings")
+      .select("date")
+      .distinct("date")
+      .select(Database.raw('DATE_FORMAT(date, "%Y-%m-%d") as date'))
+      .where({ type_id: params.type_id });
+      
+    return allBooking
+
+    /*// let allBooking = await Booking.findBy("type_id", params.type_id);
     // let allBookingJSON = allBooking.toJSON();
     let allBooking = await Database.table("bookings")
       .select("booking_id", "date")
@@ -50,7 +58,7 @@ class BookingController {
         }
       }
     }
-    return sendBooking;
+    return sendBooking;*/
   }
 }
 
