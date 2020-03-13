@@ -6,15 +6,16 @@ const Schema = use('Schema')
 class BookingSchema extends Schema {
   up () {
     this.create('bookings', (table) => {
-      table.string('booking_id', 100).primary() // PK
-      //table.integer('time_in', 15)
-      //table.string('time_out', 15)
+      table.increments('booking_id').primary() // PK
       table.time('time_in')
       table.time('time_out')
       table.date('date')
       table.boolean('status').defaultTo(false) // [Boolean] // CK
+      table.text('comment_from_user')
+      table.text('comment_from_staff')
+      table.boolean('check').defaultTo(false)
+      table.integer('booking_agent') // [FK] refer to user table
       table.integer('type_id') // [FK]
-     
       table.timestamps()
     })
   }

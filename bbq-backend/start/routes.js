@@ -30,5 +30,6 @@ Route.post("createtype", "CreateTypeController.create");
 Route.post("updatetype", "CreateTypeController.update");
 Route.post("createbooking", "CreateBookingController.create");
 
-Rounte.get("/ServiceTypes","")
-
+//for booking feature
+Route.get("/serviceTypes","BookingController.showtype")
+Route.get("/serviceDate/:type_id","BookingController.sendbooking")
