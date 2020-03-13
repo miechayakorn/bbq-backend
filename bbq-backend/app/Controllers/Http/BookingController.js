@@ -4,7 +4,7 @@ const Booking = use("App/Models/Booking");
 const Database = use("Database");
 
 class BookingController {
-  async showtype({ request, response }) {
+  async showType({ request, response }) {
     try {
       let types = await Type.all(); // fatch all record from types table
       let typeJSON = types.toJSON(); // parse to json
@@ -24,16 +24,16 @@ class BookingController {
       return response.status(error.status).send(error);
     }
   }
-//array : [{type_id:1,date:2020-03-20},{type_id:1,date:2020-03-20,{type_id:1,date:2020-03-20},{type_id:1,date:2020-03-20}}]
+  //array : [{type_id:1,date:2020-03-20},{type_id:1,date:2020-03-20,{type_id:1,date:2020-03-20},{type_id:1,date:2020-03-20}}]
 
-  async sendbooking({ request, response, params }) {
+  async showDate({ request, response, params }) {
     let allBooking = await Database.table("bookings")
       .select("date")
       .distinct("date")
       .select(Database.raw('DATE_FORMAT(date, "%Y-%m-%d") as date'))
       .where({ type_id: params.type_id });
-      
-    return allBooking
+
+    return allBooking;
 
     /*// let allBooking = await Booking.findBy("type_id", params.type_id);
     // let allBookingJSON = allBooking.toJSON();
@@ -59,6 +59,19 @@ class BookingController {
       }
     }
     return sendBooking;*/
+  }
+
+  async showTime({ request, response, params }) {
+    const data = request.all("time");
+    try {
+      let allTime = await Database.table("bookings")
+        .select("time_in")
+        .where({ date: data.time, type_id: params.type_id });
+      return allTime;
+      
+    } catch (error) {
+      return error;
+    }
   }
 }
 
