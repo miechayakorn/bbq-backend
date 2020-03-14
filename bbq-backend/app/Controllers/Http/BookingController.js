@@ -10,16 +10,13 @@ class BookingController {
       let types = await Type.all(); // fatch all record from types table
       let typeJSON = types.toJSON(); // parse to json
       const returnType = []; // return to fontend type_id and type_name only
-
       for (let index = 0; index < typeJSON.length; index++) {
         returnType[index] = {
           type_id: typeJSON[index].type_id,
           type_name: typeJSON[index].type_name
         };
       }
-
       console.log(returnType);
-
       return returnType;
     } catch (error) {
       return response.status(error.status).send(error);
@@ -33,7 +30,6 @@ class BookingController {
         .distinct("date")
         .select(Database.raw('DATE_FORMAT(date, "%Y-%m-%d") as date'))
         .where({ type_id: params.type_id });
-
       return allBooking;
     } catch (error) {
       return error;
@@ -54,12 +50,11 @@ class BookingController {
 
   async submitBooking({ request, response }) {
     try {
-      const data = request.only(["booking_id", "user_id"]);
+      const data = request.only(["booking_id", "user_id", "symptom"]);
       console.log(data);
-      console.log("--------------------------------------------------");
       const user = await User.find(data.user_id);
-      console.log(user.toJSON());
-      console.log("--------------------------------------------------");
+      const userJSON = user.toJSON();
+      console.log(userJSON);
       const booking = await Booking.find(data.booking_id);
       const bookingJSON = booking.toJSON();
       console.log(bookingJSON);
@@ -67,11 +62,14 @@ class BookingController {
         if (bookingJSON.status == 0) {
           await Database.table("bookings")
             .where("booking_id", data.booking_id)
-            .update({ booking_agent: user.user_id, status: true });
+            .update({
+              booking_agent: userJSON.user_id,
+              status: true,
+              comment_from_user: data.symptom
+            });
           let bookingSuccess = await Booking.find(data.booking_id);
           return bookingSuccess;
         }
-
         return response.status(400).send("This booking unavailable");
       }
     } catch (error) {
