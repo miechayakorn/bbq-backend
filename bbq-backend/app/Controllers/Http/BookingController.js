@@ -1,6 +1,7 @@
 "use strict";
 const Type = use("App/Models/Type");
 const Booking = use("App/Models/Booking");
+const User = use("App/Models/User");
 const Database = use("Database");
 
 class BookingController {
@@ -24,53 +25,79 @@ class BookingController {
       return response.status(error.status).send(error);
     }
   }
-  //array : [{type_id:1,date:2020-03-20},{type_id:1,date:2020-03-20,{type_id:1,date:2020-03-20},{type_id:1,date:2020-03-20}}]
 
   async showDate({ request, response, params }) {
-    let allBooking = await Database.table("bookings")
-      .select("date")
-      .distinct("date")
-      .select(Database.raw('DATE_FORMAT(date, "%Y-%m-%d") as date'))
-      .where({ type_id: params.type_id });
+    try {
+      let allBooking = await Database.table("bookings")
+        .select("type_id", "date")
+        .distinct("date")
+        .select(Database.raw('DATE_FORMAT(date, "%Y-%m-%d") as date'))
+        .where({ type_id: params.type_id });
 
-    return allBooking;
-
-    /*// let allBooking = await Booking.findBy("type_id", params.type_id);
-    // let allBookingJSON = allBooking.toJSON();
-    let allBooking = await Database.table("bookings")
-      .select("booking_id", "date")
-      .select(Database.raw('DATE_FORMAT(date, "%Y-%m-%d") as date'))
-      .where({ type_id: params.type_id });
-    let sendBooking = [];
-    for (let i = 0; i < allBooking.length; i++) {
-      if(sendBooking.length == 0){
-          sendBooking [i] = {
-              booking_id: allBooking[i].booking_id,
-              date: allBooking[i].date
-          }
-      }
-      for (let j = 0; j < allBooking.length; j++) {
-        if (sendBooking[i].date!== allBooking[j].date) {
-          sendBooking[i] = {
-            booking_id: allBooking[j].booking_id,
-            date: allBooking[j].date
-          };
-        }
-      }
+      return allBooking;
+    } catch (error) {
+      return error;
     }
-    return sendBooking;*/
   }
 
   async showTime({ request, response, params }) {
-    const data = request.all("time");
+    let data = request.all("time");
     try {
       let allTime = await Database.table("bookings")
-        .select("time_in")
+        .select("booking_id", "type_id", "time_in", "status")
         .where({ date: data.time, type_id: params.type_id });
       return allTime;
-      
     } catch (error) {
       return error;
+    }
+  }
+
+  async submitBooking({ request, response }) {
+    try {
+      const data = request.only(["booking_id", "user_id"]);
+      console.log(data);
+      console.log("--------------------------------------------------");
+      const user = await User.find(data.user_id);
+      console.log(user.toJSON());
+      console.log("--------------------------------------------------");
+      const booking = await Booking.find(data.booking_id);
+      const bookingJSON = booking.toJSON();
+      console.log(bookingJSON);
+      if (user) {
+        if (bookingJSON.status == 0) {
+          await Database.table("bookings")
+            .where("booking_id", data.booking_id)
+            .update({ booking_agent: user.user_id, status: true });
+          let bookingSuccess = await Booking.find(data.booking_id);
+          return bookingSuccess;
+        }
+
+        return response.status(400).send("This booking unavailable");
+      }
+    } catch (error) {
+      return response.status(500).send(error);
+    }
+  }
+
+  async showBookingForHCARE({ request, response, params }) {
+    try {
+      let showbook = await Database.select("*")
+        .from("bookings")
+        .where({ type_id: params.type, status: 1 });
+      return showbook;
+    } catch (error) {
+      return response.status(500).send(error);
+    }
+  }
+
+  async showBookingForUser({ request, response, params }) {
+    try {
+      let showbook = await Database.select("*")
+        .from("bookings")
+        .where({ booking_agent: params.user_id, status: 1 });
+      return showbook;
+    } catch (error) {
+      response.status(500).send(error);
     }
   }
 }

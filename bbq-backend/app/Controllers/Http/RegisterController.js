@@ -42,10 +42,12 @@ class RegisterController {
       await Database.table("accounts")
         .where("account_id", account.$attributes.id)
         .update("user_id", user.$attributes.id); // update foreign key to account
-
+      
+      return account;
       console.log(account);
     } catch (err) {
-      return response.status(err.status).send(err); //sent error message
+      // return response.status(err.status).send(err); //sent error message
+      return response.status(500).send(err);
     }
   }
 }

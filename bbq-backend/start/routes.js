@@ -31,6 +31,9 @@ Route.post("updatetype", "CreateTypeController.update");
 Route.post("createbooking", "CreateBookingController.create");
 
 //for booking feature
-Route.get("/serviceTypes","BookingController.showType")
-Route.get("/serviceDate/:type_id","BookingController.showDate")
-Route.get("/ServiceTime/:type_id","BookingController.showTime")
+Route.get("/ServiceTypes", "BookingController.showType");
+Route.get("/ServiceDate/:type_id", "BookingController.showDate");
+Route.get("/ServiceTime/:type_id", "BookingController.showTime");
+Route.post("/Booking", "BookingController.submitBooking");
+Route.get("/ShowStaffBooking/:type", 'BookingController.showBookingForHCARE');
+Route.get("/ShowUserBooking/:user_id", 'BookingController.showBookingForUser');
