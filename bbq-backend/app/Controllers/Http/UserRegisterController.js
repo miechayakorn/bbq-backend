@@ -1,9 +1,10 @@
 "use strict";
 const Database = use("Database");
 const Account = use("App/Models/Account");
-const Staff = use("App/Models/Staff");
-class RegisterController {
-  async createStaff({ request, response }) {
+const User = use("App/Models/User");
+
+class UserRegisterController {
+  async createUser({ request, response }) {
     try {
       const data = request.only([
         "password",
@@ -17,7 +18,7 @@ class RegisterController {
         "last_name"
       ]);
 
-      const account = await Account.create({
+      const accountUser = await Account.create({
         password: data.password,
         hn_number: data.hn_number,
         priviledge: data.priviledge,
@@ -25,28 +26,30 @@ class RegisterController {
         telephone: data.telephone
       });
 
-      const staff = await Staff.create({
+      const user = await User.create({
         gender: data.gender,
         date_of_birth: data.date_of_birth,
         first_name: data.first_name,
         last_name: data.last_name,
-        account_id: account.$attributes.account_id
+        account_id: accountUser.$attributes.account_id
       });
-
-      console.log(account);
+      console.log(accountUser);
       console.log(
         "------------------------------------------------------------------"
       );
-      const staffAdd = await Staff.findBy(
+      const userAdd = await User.findBy(
         "account_id",
-        account.$attributes.account_id
+        accountUser.$attributes.account_id
       );
-      console.log(staffAdd);
+      console.log(userAdd);
 
       await Database.table("accounts")
-        .where("account_id", account.$attributes.account_id)
-        .update("staff_id", staffAdd.staff_id); // update foreign key to account
-      const sendAccount = await Account.find(account.$attributes.account_id);
+        .where("account_id", accountUser.$attributes.account_id)
+        .update("user_id", userAdd.user_id);
+
+      const sendAccount = await Account.find(
+        accountUser.$attributes.account_id
+      );
       return sendAccount;
     } catch (err) {
       return response.status(500).send(err);
@@ -54,4 +57,4 @@ class RegisterController {
   }
 }
 
-module.exports = RegisterController;
+module.exports = UserRegisterController;

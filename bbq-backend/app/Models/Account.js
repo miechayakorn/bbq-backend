@@ -14,9 +14,12 @@ class Account extends Model {
       }
     });
   }
+  static get primaryKey() {
+    return "account_id";
+  }
 
-  user(){
-      return this.hasOne("App/Models/User")
+  user() {
+    return this.hasOne("App/Models/User");
   }
 }
 
