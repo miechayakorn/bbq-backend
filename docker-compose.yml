@@ -32,6 +32,7 @@ services:
   ### ADONIS #####################################
   adonis:
     build: ./hcare-backend
+    image: adonis-app-prod:1.0
     container_name: hcare_adonis
     restart: always
     networks:
