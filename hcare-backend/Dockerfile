@@ -2,7 +2,7 @@
 FROM node:12-alpine as base
 
 WORKDIR /src
-COPY package.json package-lock.json /src/
+COPY package.json /src/
 COPY .env.docker .env
 COPY ./init.sh init.sh
 COPY . /src
