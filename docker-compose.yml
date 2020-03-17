@@ -1,0 +1,57 @@
+version: "3.1"
+services:
+  ### NGINX #####################################
+  nginx:
+    image: nginx:1.17.8-alpine
+    container_name: hcare_nginx
+    ports:
+      - 80:80
+    # - 443:443
+    volumes:
+      - ./nginx:/etc/nginx
+      - ./www/:/usr/share/nginx/html
+    restart: always
+    networks:
+      - api-network
+
+  ### My SQL #####################################
+  mysql:
+    image: mysql:5.7
+    container_name: hcare_mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: bbq
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    restart: always
+    networks:
+      - api-network
+
+  ### ADONIS #####################################
+  adonis:
+    build: ./adonis
+    container_name: hcare_adonis
+    restart: always
+    networks:
+      - api-network
+    links:
+      - mysql
+
+  ### PHPMYADMIN #####################################
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: hcare_pma
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8183:80
+
+networks:
+  api-network:

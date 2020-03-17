@@ -1,0 +1,32 @@
+image : docker
+
+services :
+    - docker:dind
+
+stages:
+  - test
+  - deploy
+
+test:
+  stage: test
+  only:
+    - develop
+    - master
+  script:
+    - echo run tests in this section
+    # - docker ps
+    # - docker-compose up -d
+    # - cd ./server
+    # - npm install
+    # - npm test
+
+step-deploy-prod:
+  stage: deploy
+  only:
+    - master
+  script:
+    - docker ps
+    - docker-compose up -d
+  when: manual
+
+
