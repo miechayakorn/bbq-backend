@@ -36,11 +36,11 @@ services:
     container_name: hcare_adonis
     ports:
       - 3333:3333
-    restart: always
+    # restart: always
     networks:
       - api-network
-    links:
-      - mysql
+    # links:
+    #   - mysql
 
   ### PHPMYADMIN #####################################
   phpmyadmin:
