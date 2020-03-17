@@ -8,7 +8,8 @@ COPY ./init.sh init.sh
 COPY . /src
 EXPOSE 3333
 RUN npm i -g @adonisjs/cli pm2
-RUN chmod 755 /src/init.sh
+RUN chmod +x /src/init.sh
+RUN /src/init.sh
 
 #==== Deploy Stage ====#
 FROM base as production
