@@ -1,12 +1,21 @@
-FROM node:13.10-alpine
+#==== Build Stage ====#
+FROM node:12-alpine as base
 
-COPY . /app/adonis/
+WORKDIR /src
+COPY package.json package-lock.json /src/
+COPY .env.docker .env
+COPY ./init.sh init.sh
+COPY . /src
+EXPOSE 3333
+RUN npm i -g @adonisjs/cli pm2
+RUN /src/init.sh
 
-WORKDIR /app/adonis
+#==== Deploy Stage ====#
+FROM base as production
 
-ADD init.sh /
-RUN /init.sh
-
+ENV NODE_ENV=production
+RUN npm install
 CMD ["npm", "run", "serve"]
 
-EXPOSE 3333
+
+
