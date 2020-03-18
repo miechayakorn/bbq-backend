@@ -12,6 +12,7 @@ test:
   only:
     - develop
     - master
+    - feature/makeAppointment
   script:
     - echo run tests in this section
     # - docker ps
@@ -24,6 +25,7 @@ step-deploy-prod:
   stage: deploy
   only:
     - master
+    - feature/makeAppointment
   script:
     - docker ps
     - docker-compose up -d
