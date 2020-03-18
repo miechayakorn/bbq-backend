@@ -8,17 +8,16 @@ class Booking extends Model {
   static get primaryKey() {
     return "booking_id";
   }
-  static get dates () {
-    return super.dates.concat(['date'])
+  static get dates() {
+    return super.dates.concat(["date"]);
   }
 
-  static formatDates (field, value) {
-    if (field === 'date') {
-        return value.format('DD-MM-YYYY')
-       }
-    return super.formatDates(field, value)
+  static formatDates(field, value) {
+    if (field === "date") {
+      return value.format("DD-MM-YYYY");
+    }
+    return super.formatDates(field, value);
   }
-
 }
 
 module.exports = Booking;

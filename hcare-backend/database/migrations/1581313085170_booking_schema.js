@@ -14,7 +14,7 @@ class BookingSchema extends Schema {
       table.text('comment_from_user')
       table.text('comment_from_staff')
       table.boolean('check').defaultTo(false)
-      table.integer('booking_agent') // [FK] refer to user table
+      table.string('hn_number', 20) // [FK] 
       table.integer('type_id') // [FK]
       table.timestamps()
     })

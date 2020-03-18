@@ -2,6 +2,7 @@
 const Type = use("App/Models/Type");
 const Booking = use("App/Models/Booking");
 const User = use("App/Models/User");
+const Account = use("App/Models/Account");
 const Database = use("Database");
 
 class BookingController {
@@ -50,24 +51,36 @@ class BookingController {
 
   async submitBooking({ request, response }) {
     try {
-      const data = request.only(["booking_id", "user_id", "symptom"]);
-      console.log(data);
-      const user = await User.find(data.user_id);
-      const userJSON = user.toJSON();
-      console.log(userJSON);
-      const booking = await Booking.find(data.booking_id);
-      const bookingJSON = booking.toJSON();
-      console.log(bookingJSON);
-      if (user) {
-        if (bookingJSON.status == 0) {
+      const dataFromBooking = request.only([
+        "booking_id",
+        "hn_number",
+        "symptom"
+      ]);
+      console.log(dataFromBooking);
+      const userAccount = await Account.findBy(
+        "hn_number",
+        dataFromBooking.hn_number
+      );
+      const userAccountJSON = userAccount.toJSON();
+      console.log(userAccountJSON);
+
+      const findBooking = await Booking.find(dataFromBooking.booking_id);
+      const findBookingJSON = findBooking.toJSON();
+      console.log(findBookingJSON);
+
+      if (userAccountJSON) {
+        console.log("------------------------------------------");
+        if (findBookingJSON.status == 0) {
+          console.log("*****************************************************");
           await Database.table("bookings")
-            .where("booking_id", data.booking_id)
+            .where("booking_id", dataFromBooking.booking_id)
             .update({
-              booking_agent: userJSON.user_id,
+              hn_number: userAccountJSON.hn_number,
               status: true,
-              comment_from_user: data.symptom
+              comment_from_user: dataFromBooking.symptom
             });
-          let bookingSuccess = await Booking.find(data.booking_id);
+          let bookingSuccess = await Booking.find(dataFromBooking.booking_id);
+          console.log(bookingSuccess);
           return bookingSuccess;
         }
         return response.status(400).send("This booking unavailable");
@@ -79,10 +92,39 @@ class BookingController {
 
   async showBookingForHCARE({ request, response, params }) {
     try {
-      let showbook = await Database.select("*")
-        .from("bookings")
-        .where({ type_id: params.type, status: 1 });
-      return showbook;
+      console.log(params.type + " " + params.date);
+      let userBooking2 = await Database.select(
+        "accounts.hn_number",
+        "first_name",
+        "last_name",
+        "time_in"
+      )
+        .from("users")
+        .innerJoin("accounts", "users.user_id", "accounts.user_id")
+        .innerJoin("bookings", "accounts.hn_number", "bookings.hn_number")
+        .where({ type_id: params.type, date: params.date });
+      console.log("--------------------------------------------------");
+      console.log(userBooking2);
+      return userBooking2;
+    } catch (error) {
+      return response.status(500).send(error);
+    }
+  }
+
+  async showBookingForHCAREDefault({ request, response }) {
+    try {
+      let userBooking = await Database.select(
+        "accounts.hn_number",
+        "first_name",
+        "last_name",
+        "time_in"
+      )
+        .from("users")
+        .innerJoin("accounts", "users.user_id", "accounts.user_id")
+        .innerJoin("bookings", "accounts.hn_number", "bookings.hn_number");
+      console.log("--------------------------------------------------");
+      console.log(userBooking);
+      return userBooking;
     } catch (error) {
       return response.status(500).send(error);
     }

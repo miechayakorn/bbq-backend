@@ -36,5 +36,9 @@ Route.get("/ServiceTypes", "BookingController.showType");
 Route.get("/ServiceDate/:type_id", "BookingController.showDate");
 Route.get("/ServiceTime/:type_id", "BookingController.showTime");
 Route.post("/Booking", "BookingController.submitBooking");
-Route.get("/ShowStaffBooking/:type", 'BookingController.showBookingForHCARE');
+
 Route.get("/ShowUserBooking/:user_id", 'BookingController.showBookingForUser');
+
+//show for healthcare
+Route.get("/ShowStaffBookingDefault", 'BookingController.showBookingForHCAREDefault');
+Route.get("/ShowStaffBooking/:type/:date", 'BookingController.showBookingForHCARE');

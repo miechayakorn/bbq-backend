@@ -13,8 +13,10 @@ class CreateTypeController {
         "creator_id"
       ]);
       console.log(data);
-      let type = await Type.create(data);
-      return type;
+      const typeCreate = await Type.create(data);
+      console.log(typeCreate)
+      //const typeJustCreate = Database.from('types').th
+      return typeCreate;
     } catch (error) {
       return response.status(error.status).send(error);
     }

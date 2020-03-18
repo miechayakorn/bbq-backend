@@ -11,6 +11,7 @@ class StaffSchema extends Schema {
       table.string("date_of_birth", 10).notNullable(); //[NN]
       table.string("first_name", 80).notNullable(); // [NN]
       table.string("last_name", 80).notNullable(); // [NN]
+      table.integer("account_id").unique(); // [FK.UQ]
       table.timestamps();
     });
   }
