@@ -5,7 +5,7 @@ WORKDIR /src
 COPY package.json /src/
 COPY .env.docker .env
 COPY ./init.sh init.sh
-VOLUME . /src
+COPY . /src
 RUN npm i -g @adonisjs/cli pm2
 RUN chmod +x /src/init.sh
 RUN /src/init.sh
