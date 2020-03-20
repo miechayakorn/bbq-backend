@@ -42,3 +42,5 @@ Route.get("/ShowUserBooking/:user_id", 'BookingController.showBookingForUser');
 //show for healthcare
 Route.get("/ShowStaffBookingDefault", 'BookingController.showBookingForHCAREDefault');
 Route.get("/ShowStaffBooking/:type/:date", 'BookingController.showBookingForHCARE');
+
+Route.get('/bookings/:id/confirm', 'BookingController.confirmBooking')

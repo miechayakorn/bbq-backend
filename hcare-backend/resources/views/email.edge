@@ -1,0 +1,8 @@
+<div>
+ 
+    <h1>ยืนยันจากจองตารางนัดหมาย {{bookingSlot.type_name}} </h1>
+
+    <p>{{user.first_name}} {{user.last_name}} ต้องการจองนัด {{bookingSlot.type_name}} ในเวลา {{bookingSlot.time_in}} ถึง {{bookingSlot.time_out}}</p>
+    
+   <a href="http://localhost:3333/bookings/{{bookingSlot.booking_id}}/confirm?token={{token}}">ยืนยันการจอง</a>
+</div>;

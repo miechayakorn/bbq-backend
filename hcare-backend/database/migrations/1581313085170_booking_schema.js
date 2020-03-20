@@ -10,12 +10,13 @@ class BookingSchema extends Schema {
       table.time('time_in')
       table.time('time_out')
       table.date('date')
-      table.boolean('status').defaultTo(false) // [Boolean] // CK
+      table.string('status').nullable() // 3 status (null , waitting confirm , confirm successful)
       table.text('comment_from_user')
       table.text('comment_from_staff')
       table.boolean('check').defaultTo(false)
       table.string('hn_number', 20) // [FK] 
       table.integer('type_id') // [FK]
+      table.string('token').nullable()
       table.timestamps()
     })
   }

@@ -14,7 +14,7 @@ class CreateTypeController {
       ]);
       console.log(data);
       const typeCreate = await Type.create(data);
-      console.log(typeCreate)
+      console.log(typeCreate);
       //const typeJustCreate = Database.from('types').th
       return typeCreate;
     } catch (error) {

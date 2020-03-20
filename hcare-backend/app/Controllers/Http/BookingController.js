@@ -4,6 +4,7 @@ const Booking = use("App/Models/Booking");
 const User = use("App/Models/User");
 const Account = use("App/Models/Account");
 const Database = use("Database");
+const Mail = use("Mail");
 
 class BookingController {
   async showType({ request, response }) {
@@ -57,31 +58,85 @@ class BookingController {
         "symptom"
       ]);
       console.log(dataFromBooking);
-      const userAccount = await Account.findBy(
-        "hn_number",
-        dataFromBooking.hn_number
-      );
-      const userAccountJSON = userAccount.toJSON();
-      console.log(userAccountJSON);
 
-      const findBooking = await Booking.find(dataFromBooking.booking_id);
-      const findBookingJSON = findBooking.toJSON();
-      console.log(findBookingJSON);
+      //find account from hn_number
+      const userAccount = await Database.select(
+        "accounts.hn_number",
+        "email",
+        "first_name",
+        "last_name"
+      )
+        .from("users")
+        .innerJoin("accounts", "users.user_id", "accounts.user_id")
+        .where("accounts.hn_number", dataFromBooking.hn_number)
+        .first();
 
-      if (userAccountJSON) {
-        console.log("------------------------------------------");
-        if (findBookingJSON.status == 0) {
-          console.log("*****************************************************");
-          await Database.table("bookings")
-            .where("booking_id", dataFromBooking.booking_id)
-            .update({
-              hn_number: userAccountJSON.hn_number,
-              status: true,
-              comment_from_user: dataFromBooking.symptom
-            });
-          let bookingSuccess = await Booking.find(dataFromBooking.booking_id);
-          console.log(bookingSuccess);
-          return bookingSuccess;
+      console.log(userAccount);
+
+      // find booking slot from bookingID that get from request to find in DB
+      const findBooking = await Database.select(
+        "booking_id",
+        "type_name",
+        "time_in",
+        "time_out",
+        "date",
+        "status"
+      )
+        .from("bookings")
+        .innerJoin("types", "bookings.type_id", "types.type_id")
+        .where("bookings.booking_id", dataFromBooking.booking_id)
+        .first();
+
+      console.log(findBooking);
+
+      if (userAccount) {
+        // check account not null
+        console.log("00000000000000000000000000000000000000");
+
+        if (!findBooking.status) {
+          // check booking status available
+          console.log("1111111111111111111111111111111111111111111111111");
+          const token = `${Date.now()}${findBooking.booking_id}`;
+
+          console.log(token);
+
+          const dataForSendEmail = {
+            user: userAccount,
+            bookingSlot: findBooking,
+            token
+          };
+
+          console.log(dataForSendEmail);
+
+          console.log(userAccount.email);
+
+          await Mail.send("email", dataForSendEmail, message => {
+            message
+              .to(userAccount.email)
+              .from("demo@demo-adonis.com")
+              .subject(
+                `Submit Booking From Health Care ${bookingSlot.type_name}`
+              );
+          });
+
+          console.log(
+            "///////////////////////////////////////////////////////////"
+          );
+
+          // if (sendMail) {
+          //   await Database.table("bookings")
+          //     .where("booking_id", dataFromBooking.booking_id)
+          //     .update({
+          //       hn_number: dataFromBooking.hn_number,
+          //       status: "waitting confirm",
+          //       comment_from_user: dataFromBooking.symptom
+          //     });
+
+          return "send mail success";
+
+          // let bookingSuccess = await Booking.find(dataFromBooking.booking_id);
+          // console.log(bookingSuccess);
+          // return bookingSuccess;
         }
         return response.status(400).send("This booking unavailable");
       }
@@ -130,14 +185,36 @@ class BookingController {
     }
   }
 
-  async showBookingForUser({ request, response, params }) {
-    try {
-      let showbook = await Database.select("*")
-        .from("bookings")
-        .where({ booking_agent: params.user_id, status: 1 });
-      return showbook;
-    } catch (error) {
-      response.status(500).send(error);
+  // async showBookingForUser({ request, response, params }) {
+  //   try {
+  //     let showbook = await Database.select("*")
+  //       .from("bookings")
+  //       .where({ booking_agent: params.user_id, status:  });
+  //     return showbook;
+  //   } catch (error) {
+  //     response.status(500).send(error);
+  //   }
+  // }
+
+  async confirmBooking({ request, response }) {
+    const query = request.get();
+    if (query.token) {
+      const booking = await Booking.query()
+        .where("token", query.token)
+        .first();
+      if (booking) {
+        booking.status = "confirm successful";
+        booking.token = "";
+        await booking.save();
+
+        return response.json({
+          message: "booking confirm successful!"
+        });
+      }
+    } else {
+      return response.json({
+        message: "token not exist"
+      });
     }
   }
 }
