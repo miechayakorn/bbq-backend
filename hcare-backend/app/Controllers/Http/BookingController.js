@@ -91,11 +91,10 @@ class BookingController {
 
       if (userAccount) {
         // check account not null
-        console.log("00000000000000000000000000000000000000");
 
         if (!findBooking.status) {
           // check booking status available
-          console.log("1111111111111111111111111111111111111111111111111");
+
           const token = `${Date.now()}${findBooking.booking_id}`;
 
           console.log(token);
@@ -108,29 +107,28 @@ class BookingController {
 
           console.log(dataForSendEmail);
 
-          console.log(userAccount.email);
+          const subject =
+            "Submit Booking From Health Care" +
+            dataForSendEmail.bookingSlot.type_name.toString();
 
           await Mail.send("email", dataForSendEmail, message => {
             message
               .to(userAccount.email)
               .from("demo@demo-adonis.com")
-              .subject(
-                `Submit Booking From Health Care ${bookingSlot.type_name}`
-              );
+              .subject(subject);
           });
 
           console.log(
-            "///////////////////////////////////////////////////////////"
+            "000000000000000000000000000000000000000000000000000000000"
           );
 
-          // if (sendMail) {
-          //   await Database.table("bookings")
-          //     .where("booking_id", dataFromBooking.booking_id)
-          //     .update({
-          //       hn_number: dataFromBooking.hn_number,
-          //       status: "waitting confirm",
-          //       comment_from_user: dataFromBooking.symptom
-          //     });
+          await Database.table("bookings")
+            .where("booking_id", dataFromBooking.booking_id)
+            .update({
+              hn_number: dataForSendEmail.user.hn_number,
+              status: "waitting confirm",
+              comment_from_user: dataFromBooking.symptom
+            });
 
           return "send mail success";
 
