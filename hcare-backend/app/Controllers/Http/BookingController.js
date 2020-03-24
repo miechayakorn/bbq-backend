@@ -82,6 +82,7 @@ class BookingController {
         "date",
         "status"
       )
+        .select(Database.raw('DATE_FORMAT(date, "%d-%m-%Y") as date'))
         .from("bookings")
         .innerJoin("types", "bookings.type_id", "types.type_id")
         .where("bookings.booking_id", dataFromBooking.booking_id)
@@ -114,7 +115,7 @@ class BookingController {
           await Mail.send("email", dataForSendEmail, message => {
             message
               .to(userAccount.email)
-              .from("demo@demo-adonis.com")
+              .from("Mail from healthcare")
               .subject(subject);
           });
 
@@ -127,7 +128,8 @@ class BookingController {
             .update({
               hn_number: dataForSendEmail.user.hn_number,
               status: "waitting confirm",
-              comment_from_user: dataFromBooking.symptom
+              comment_from_user: dataFromBooking.symptom,
+              token: token
             });
 
           return "send mail success";
@@ -196,17 +198,22 @@ class BookingController {
 
   async confirmBooking({ request, response }) {
     const query = request.get();
+    
     if (query.token) {
-      const booking = await Booking.query()
-        .where("token", query.token)
-        .first();
-      if (booking) {
-        booking.status = "confirm successful";
-        booking.token = "";
-        await booking.save();
+      const booking = await Booking.findBy("token", query.token);
+     
+      console.log('---------------------------------------------')
+     
+      if (booking) {   
+        await Booking.query()
+          .where("booking_id", booking.booking_id)
+          .update({ status: "confirm successful", token: null });
+
+        const bookingNew = await Booking.find(booking.booking_id);
 
         return response.json({
-          message: "booking confirm successful!"
+          message: "booking confirm successful!",
+          booking: bookingNew
         });
       }
     } else {
