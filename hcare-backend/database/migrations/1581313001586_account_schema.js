@@ -16,6 +16,8 @@ class AccountSchema extends Schema {
       table.string('telephone', 15).notNullable() // [NN]
       table.integer('user_id').unique() //[FK,UQ]
       table.integer('staff_id').unique() //[FK,UQ]
+      table.string('activate').nullable()
+      table.string('token_activate').nullable()
       
 
       table.timestamps()

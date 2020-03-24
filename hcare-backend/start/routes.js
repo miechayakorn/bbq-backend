@@ -20,12 +20,8 @@ const Database = use("Database");
 Route.on("/").render("welcome");
 //Route.post('users', 'UserController.store')
 Route.post("/register", "UserRegisterController.createUser");
+Route.get("/confirmregister", "UserRegisterController.confirmRegister");
 Route.post("/staffRegister", "RegisterController.createStaff");
-// Route.get("showaccount", async () => {
-//   let user = await Database.table("accounts").select();
-//   return user;
-// });
-//Route.post('register', 'UserController.create')
 
 Route.post("createtype", "CreateTypeController.create");
 Route.post("updatetype", "CreateTypeController.update");
