@@ -1,8 +1,9 @@
 "use strict";
 const Database = use("Database");
 const Account = use("App/Models/Account");
-const User = use("App/Models/User");
+const Token = use("App/Models/Token");
 const Mail = use("Mail");
+const Hash = use("Hash");
 
 class UserRegisterController {
   async createUser({ request, response }) {
@@ -10,56 +11,32 @@ class UserRegisterController {
       const data = request.only([
         "password",
         "hn_number",
-        "priviledge",
         "email",
         "telephone",
-        // "gender",
-        // "date_of_birth",
         "first_name",
         "last_name"
       ]);
 
+      console.log(data);
+
       const accountUser = await Account.create({
         password: data.password,
         hn_number: data.hn_number,
-        priviledge: data.priviledge,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        role: "user",
         email: data.email,
         telephone: data.telephone
       });
 
-      const user = await User.create({
-        // gender: data.gender,
-        // date_of_birth: data.date_of_birth,
-        first_name: data.first_name,
-        last_name: data.last_name,
-        account_id: accountUser.$attributes.account_id
-      });
-      console.log(accountUser);
-      console.log(
-        "------------------------------------------------------------------"
-      );
-      const userAdd = await User.findBy(
-        "account_id",
-        accountUser.$attributes.account_id
-      );
-      console.log(userAdd);
-
-      const updateaccount = await Database.table("accounts")
-        .where("account_id", accountUser.$attributes.account_id)
-        .update("user_id", userAdd.user_id);
-
-      console.log("*************************************" + updateaccount);
-      if (updateaccount) {
+      if (accountUser) {
         const token = `${Date.now()}${accountUser.$attributes.hn_number}`;
-
+        const tokenHash = await Hash.make(token);
         const dataForSendEmail = {
           account: await Database.table("accounts")
             .where("account_id", accountUser.$attributes.account_id)
             .first(),
-          user: await Database.table("users")
-            .where("user_id", userAdd.user_id)
-            .first(),
-          token
+          tokenHash
         };
 
         console.log(dataForSendEmail);
@@ -79,9 +56,13 @@ class UserRegisterController {
         console.log(sendMail);
 
         if (sendMail) {
-          await Database.table("accounts")
-            .where("account_id", dataForSendEmail.account.account_id)
-            .update({ activate: "waiting activate", token_activate: token });
+          const createTokenDB = await Token.create({
+            account_id: dataForSendEmail.account.account_id,
+            token: tokenHash,
+            type: "Register"
+          });
+
+          console.log(createTokenDB);
 
           return "sendmail success";
         } else {
@@ -93,18 +74,20 @@ class UserRegisterController {
     }
   }
 
+  
+  
   async confirmRegister({ request, response }) {
     const query = request.get();
     if (query.token) {
-      const accountConfirm = await Account.findBy("token_activate", query.token);
+      const accountConfirm = await Token.findBy("token", query.token);
 
       console.log("---------------------------------------------");
-      console.log("accountConfirm");
+      console.log(accountConfirm);
 
       if (accountConfirm) {
         await Account.query()
           .where("account_id", accountConfirm.account_id)
-          .update({ activate: "activate successfully" });
+          .update({ verify: true });
 
         const accountRegisterSuccessfully = await Account.find(
           accountConfirm.account_id

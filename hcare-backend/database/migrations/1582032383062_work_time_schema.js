@@ -1,21 +1,24 @@
-'use strict'
+"use strict";
 
 /** @type {import('@adonisjs/lucid/src/Schema')} */
-const Schema = use('Schema')
+const Schema = use("Schema");
 
 class WorkTimeSchema extends Schema {
-  up () {
-    this.create('work_times', (table) => {
-      table.increments('working_id').primary()
-      table.integer('day_id') //.notNullable() [FK]
-      table.integer('type_id') //.notNullable() [FK]
-      table.timestamps()
-    })
+  up() {
+    this.create("work_times", table => {
+      table.increments("working_id").primary();
+      table.integer("time_slot").notNullable();
+      table.time("start_time").notNullable();
+      table.time("end_time").notNullable();
+      table.string("day").nullable();
+      table.integer("type_id").notNullable(); // [FK]
+      table.timestamps();
+    });
   }
 
-  down () {
-    this.drop('work_times')
+  down() {
+    this.drop("work_times");
   }
 }
 
-module.exports = WorkTimeSchema
+module.exports = WorkTimeSchema;

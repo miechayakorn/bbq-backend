@@ -10,6 +10,9 @@ class WorkTime extends Model {
   // Type() {
   //   return this.belongsToMany("App/Models/Type").pivotTable("work_times");
   // }
+  static get primaryKey() {
+    return "working_id";
+  }
 }
 
 module.exports = WorkTime;

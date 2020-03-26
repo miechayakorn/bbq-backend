@@ -7,10 +7,10 @@ class CreateTypeController {
     try {
       let data = await request.only([
         "type_name",
-        "time_slot",
-        "start_time",
-        "end_time",
-        "creator_id"
+        // "time_slot",
+        // "start_time",
+        // "end_time",
+        // "creator_id"
       ]);
       console.log(data);
       const typeCreate = await Type.create(data);

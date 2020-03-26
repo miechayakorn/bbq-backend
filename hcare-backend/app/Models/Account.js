@@ -18,9 +18,9 @@ class Account extends Model {
     return "account_id";
   }
 
-  user() {
-    return this.hasOne("App/Models/User");
-  }
+  // user() {
+  //   return this.hasOne("App/Models/User");
+  // }
 }
 
 module.exports = Account;

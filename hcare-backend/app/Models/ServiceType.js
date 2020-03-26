@@ -3,10 +3,10 @@
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
 
-class Token extends Model {
+class ServiceType extends Model {
     static get primaryKey() {
-        return "token_id";
+        return "type_id";
       }
 }
 
-module.exports = Token
+module.exports = ServiceType

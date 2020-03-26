@@ -1,32 +1,33 @@
-'use strict'
+"use strict";
 
 /** @type {import('@adonisjs/lucid/src/Schema')} */
-const Schema = use('Schema')
+const Schema = use("Schema");
 
 class AccountSchema extends Schema {
-  up () {
-    this.create('accounts', (table) => {
-      
-      table.increments('account_id').primary() //  [PK]
-      table.string('password', 60).notNullable()
-      table.string('hn_number', 20).notNullable().unique() // [UQ,NN]
-      table.boolean('verify').defaultTo(false) //[T,F]
-      table.string('priviledge').notNullable() // [NN,CK]
-      table.string('email', 254).notNullable() // [NN,CK]
-      table.string('telephone', 15).notNullable() // [NN]
-      table.integer('user_id').unique() //[FK,UQ]
-      table.integer('staff_id').unique() //[FK,UQ]
-      table.string('activate').nullable()
-      table.string('token_activate').nullable()
-      
+  up() {
+    this.create("accounts", table => {
+      table.increments("account_id").primary(); //  [PK]
+      table
+        .bigInteger("hn_number")
+        .notNullable()
+        .unique(); // [UQ,NN]
+      table.string("password").notNullable();
+      table.string("first_name").notNullable();
+      table.string("last_name").notNullable();
+      table.boolean("verify").defaultTo(false); //[T,F]
+      table.string("gender", 10).nullable();
+      table.string("date_of_birth", 20).nullable();
+      table.string("email", 254).notNullable(); // [NN,CK]
+      table.bigInteger("telephone").notNullable(); // [NN]
+      table.string("role").notNullable(); // [NN]
 
-      table.timestamps()
-    })
+      table.timestamps();
+    });
   }
 
-  down () {
-    this.drop('accounts')
+  down() {
+    this.drop("accounts");
   }
 }
 
-module.exports = AccountSchema
+module.exports = AccountSchema;
