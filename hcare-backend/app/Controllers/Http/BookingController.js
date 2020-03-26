@@ -1,24 +1,26 @@
 "use strict";
-const Type = use("App/Models/Type");
+const ServiceType = use("App/Models/ServiceType");
 const Booking = use("App/Models/Booking");
-const User = use("App/Models/User");
 const Account = use("App/Models/Account");
 const Database = use("Database");
 const Mail = use("Mail");
+const Hash = use("Hash");
 
 class BookingController {
   async showType({ request, response }) {
     try {
-      let types = await Type.all(); // fatch all record from types table
-      let typeJSON = types.toJSON(); // parse to json
+      console.log("------------------------------------------------------");
+      // let types = await ServiceType.all(); // fatch all record from types table
+      // console.log(types);
+      // let typeJSON = types.toJSON(); // parse to json
+      let types = await Database.from("servicetypes");
       const returnType = []; // return to fontend type_id and type_name only
-      for (let index = 0; index < typeJSON.length; index++) {
+      for (let index = 0; index < types.length; index++) {
         returnType[index] = {
-          type_id: typeJSON[index].type_id,
-          type_name: typeJSON[index].type_name
+          type_id: types[index].type_id,
+          type_name: types[index].type_name
         };
       }
-      console.log(returnType);
       return returnType;
     } catch (error) {
       return response.status(error.status).send(error);
@@ -31,6 +33,7 @@ class BookingController {
         .select("type_id", "date")
         .distinct("date")
         .select(Database.raw('DATE_FORMAT(date, "%Y-%m-%d") as date'))
+        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .where({ type_id: params.type_id });
       return allBooking;
     } catch (error) {
@@ -43,6 +46,7 @@ class BookingController {
     try {
       let allTime = await Database.table("bookings")
         .select("booking_id", "type_id", "time_in", "status")
+        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .where({ date: data.time, type_id: params.type_id });
       return allTime;
     } catch (error) {
@@ -54,24 +58,23 @@ class BookingController {
     try {
       const dataFromBooking = request.only([
         "booking_id",
-        "hn_number",
+        "account_id",
         "symptom"
       ]);
       console.log(dataFromBooking);
 
       //find account from hn_number
       const userAccount = await Database.select(
-        "accounts.hn_number",
+        "account_id",
         "email",
         "first_name",
         "last_name"
       )
-        .from("users")
-        .innerJoin("accounts", "users.user_id", "accounts.user_id")
-        .where("accounts.hn_number", dataFromBooking.hn_number)
+        .from("accounts")
+        .where("account_id", dataFromBooking.account_id)
         .first();
 
-      console.log(userAccount);
+      console.log("************************");
 
       // find booking slot from bookingID that get from request to find in DB
       const findBooking = await Database.select(
@@ -84,7 +87,8 @@ class BookingController {
       )
         .select(Database.raw('DATE_FORMAT(date, "%d-%m-%Y") as date'))
         .from("bookings")
-        .innerJoin("types", "bookings.type_id", "types.type_id")
+        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
+        .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
         .where("bookings.booking_id", dataFromBooking.booking_id)
         .first();
 
@@ -92,16 +96,19 @@ class BookingController {
 
       if (userAccount) {
         // check account not null
-
+        console.log("+++++++++++++++++++++++++++++");
         if (!findBooking.status) {
           // check booking status available
 
-          const token = `${Date.now()}${findBooking.booking_id}`;
+          const tokenNoHash = `${Date.now()}${
+            findBooking.booking_id
+          }${Date.now()}`;
+          const token = await Hash.make(tokenNoHash);
 
           console.log(token);
 
           const dataForSendEmail = {
-            user: userAccount,
+            account: userAccount,
             bookingSlot: findBooking,
             token
           };
@@ -126,10 +133,10 @@ class BookingController {
           await Database.table("bookings")
             .where("booking_id", dataFromBooking.booking_id)
             .update({
-              hn_number: dataForSendEmail.user.hn_number,
+              account_id_from_user: dataForSendEmail.account.account_id,
               status: "waitting confirm",
               comment_from_user: dataFromBooking.symptom,
-              token: token
+              token_booking_confirm: token
             });
 
           return "send mail success";
@@ -198,16 +205,22 @@ class BookingController {
 
   async confirmBooking({ request, response }) {
     const query = request.get();
-    
+
     if (query.token) {
-      const booking = await Booking.findBy("token", query.token);
-     
-      console.log('---------------------------------------------')
-     
-      if (booking) {   
+      const booking = await Booking.findBy(
+        "token_booking_confirm",
+        query.token
+      );
+
+      console.log("---------------------------------------------");
+
+      if (booking) {
         await Booking.query()
           .where("booking_id", booking.booking_id)
-          .update({ status: "confirm successful", token: null });
+          .update({
+            status: "confirm successful",
+            token_booking_confirm: null
+          });
 
         const bookingNew = await Booking.find(booking.booking_id);
 

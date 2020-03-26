@@ -15,6 +15,8 @@ class BookingSchema extends Schema {
       table.text("comment_from_staff");
       table.boolean("check_attention").defaultTo(false);
       table.string("token_booking_confirm").nullable();
+      table.index("token_booking_confirm", "token_booking_confirm");
+      table.boolean("availability").default(true);
       table.integer("account_id_from_staff"); // [FK]
       table.integer("account_id_from_user"); // [FK]
       table.integer("working_id"); // [FK]
