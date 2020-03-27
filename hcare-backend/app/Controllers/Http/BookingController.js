@@ -116,7 +116,7 @@ class BookingController {
           console.log(dataForSendEmail);
 
           const subject =
-            "Submit Booking From Health Care" +
+            "Submit Booking From Health Care  " +
             dataForSendEmail.bookingSlot.type_name.toString();
 
           await Mail.send("email", dataForSendEmail, message => {
@@ -205,34 +205,40 @@ class BookingController {
 
   async confirmBooking({ request, response }) {
     const query = request.get();
+    try {
+      if (query.token) {
+        const booking = await Booking.findBy(
+          "token_booking_confirm",
+          query.token
+        );
 
-    if (query.token) {
-      const booking = await Booking.findBy(
-        "token_booking_confirm",
-        query.token
-      );
+        console.log("---------------------------------------------");
+        console.log(booking);
 
-      console.log("---------------------------------------------");
+        if (booking) {
+          let updateBooking = await Booking.query()
+            .where("booking_id", booking.booking_id)
+            .update({
+              status: "confirm successful",
+              token_booking_confirm: null
+            });
 
-      if (booking) {
-        await Booking.query()
-          .where("booking_id", booking.booking_id)
-          .update({
-            status: "confirm successful",
-            token_booking_confirm: null
+          const bookingNew = await Booking.find(booking.booking_id);
+
+          return response.json({
+            message: "booking confirm successful!",
+            booking: bookingNew
           });
-
-        const bookingNew = await Booking.find(booking.booking_id);
-
+        } else {
+          return "This booking has been confirmed";
+        }
+      } else {
         return response.json({
-          message: "booking confirm successful!",
-          booking: bookingNew
+          message: "token not exist"
         });
       }
-    } else {
-      return response.json({
-        message: "token not exist"
-      });
+    } catch (error) {
+      response.status(500).send(error);
     }
   }
 }

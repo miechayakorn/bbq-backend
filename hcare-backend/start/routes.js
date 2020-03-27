@@ -18,9 +18,13 @@ const Route = use("Route");
 const Database = use("Database");
 
 Route.on("/").render("welcome");
-//Route.post('users', 'UserController.store')
+
+//user register & login
 Route.post("/register", "UserRegisterController.createUser");
 Route.get("/confirmregister", "UserRegisterController.confirmRegister");
+Route.post("/login", "AuthController.authenticate");
+
+//staff register
 Route.post("/staffRegister", "RegisterController.createStaff");
 
 Route.post("createtype", "CreateTypeController.create");
@@ -32,17 +36,13 @@ Route.get("/ServiceTypes", "BookingController.showType");
 Route.get("/ServiceDate/:type_id", "BookingController.showDate");
 Route.get("/ServiceTime/:type_id", "BookingController.showTime");
 Route.post("/Booking", "BookingController.submitBooking");
+Route.get("/bookings/:id/confirm", "BookingController.confirmBooking");
 
+//show booking for individual user 
 Route.get("/ShowUserBooking/:user_id", "BookingController.showBookingForUser");
 
-//show for healthcare
-Route.get(
-  "/ShowStaffBookingDefault",
-  "BookingController.showBookingForHCAREDefault"
-);
-Route.get(
-  "/ShowStaffBooking/:type/:date",
-  "BookingController.showBookingForHCARE"
-);
+//show booking for healthcare
+Route.get("/ShowStaffBookingDefault","BookingController.showBookingForHCAREDefault");
+Route.get("/ShowStaffBooking/:type/:date","BookingController.showBookingForHCARE");
 
-Route.get("/bookings/:id/confirm", "BookingController.confirmBooking");
+

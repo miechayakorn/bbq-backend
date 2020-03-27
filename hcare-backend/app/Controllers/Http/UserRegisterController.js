@@ -74,8 +74,6 @@ class UserRegisterController {
     }
   }
 
-  
-  
   async confirmRegister({ request, response }) {
     const query = request.get();
     if (query.token) {
@@ -93,10 +91,11 @@ class UserRegisterController {
           accountConfirm.account_id
         );
 
-        return response.json({
-          message: "Register successfully",
-          booking: accountRegisterSuccessfully
-        });
+        // return response.json({
+        //   message: "Register successfully",
+        //   booking: accountRegisterSuccessfully
+        // });
+        return response.redirect("http://localhost:8080/Login");
       }
     } else {
       return response.json({
