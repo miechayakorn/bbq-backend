@@ -18,7 +18,7 @@ class AuthController {
       }
     } catch (error) {
       console.log(error);
-      return response.json({ message: "You are not registered!", error });
+      return response.status(401).json({ message: "You are not registered!", error });
     }
   }
 }
