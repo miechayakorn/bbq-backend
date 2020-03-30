@@ -9,12 +9,28 @@ class AuthController {
     try {
       if (await auth.attempt(hn_number, password)) {
         let account = await Account.findBy("hn_number", hn_number);
-        
+
         let token = await auth.generate(account);
 
-        Object.assign(account, token);
+        let dataResp = {
+          "account_id": account.account_id,
+          "hn_number": account.hn_number,
+          "first_name": account.first_name,
+          "last_name": account.last_name,
+          "verify": account.verify,
+          "gender": account.gender,
+          "date_of_birth": account.date_of_birth,
+          "email": account.email,
+          "telephone": account.telephone,
+          "role": account.role,
 
-        return response.json(account);
+          "type": token.type,
+          "token": token.token,
+          "refreshToken": token.refreshToken,
+        }
+
+
+        return response.json(dataResp);
       }
     } catch (error) {
       console.log(error);
