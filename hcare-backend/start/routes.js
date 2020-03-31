@@ -42,7 +42,7 @@ Route.get("/bookings/:id/confirm", "BookingController.confirmBooking");
 Route.get("/ShowUserBooking/:user_id", "BookingController.showBookingForUser");
 
 //show booking for healthcare
-Route.get("/ShowStaffBookingDefault","BookingController.showBookingForHCAREDefault");
-Route.get("/ShowStaffBooking/:type/:date","BookingController.showBookingForHCARE");
+Route.get("/showbooking","BookingController.showBookingForHCAREDefault");
+Route.get("/showbooking/:type/:date","BookingController.showBookingForHCARE");
 
 

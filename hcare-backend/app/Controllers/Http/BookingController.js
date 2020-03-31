@@ -7,6 +7,8 @@ const Mail = use("Mail");
 const Hash = use("Hash");
 
 class BookingController {
+ 
+ //แสดงประเภทการนัดหมาย
   async showType({ request, response }) {
     try {
       console.log("------------------------------------------------------");
@@ -27,6 +29,7 @@ class BookingController {
     }
   }
 
+//แสดงวันที่ที่นัดประเภทที่เลือกมีให้บริการ
   async showDate({ request, response, params }) {
     try {
       let allBooking = await Database.table("bookings")
@@ -41,6 +44,7 @@ class BookingController {
     }
   }
 
+//แสดงช่วงเวลาที่นัดประเภทที่เลือกและวันที่เลือกมีให้บริการ
   async showTime({ request, response, params }) {
     let data = request.all("time");
     try {
@@ -54,6 +58,7 @@ class BookingController {
     }
   }
 
+//จองตารางนัดหมาย
   async submitBooking({ request, response }) {
     try {
       const dataFromBooking = request.only([
@@ -152,57 +157,8 @@ class BookingController {
     }
   }
 
-  async showBookingForHCARE({ request, response, params }) {
-    try {
-      console.log(params.type + " " + params.date);
-      let userBooking2 = await Database.select(
-        "accounts.hn_number",
-        "first_name",
-        "last_name",
-        "time_in"
-      )
-        .from("users")
-        .innerJoin("accounts", "users.user_id", "accounts.user_id")
-        .innerJoin("bookings", "accounts.hn_number", "bookings.hn_number")
-        .where({ type_id: params.type, date: params.date });
-      console.log("--------------------------------------------------");
-      console.log(userBooking2);
-      return userBooking2;
-    } catch (error) {
-      return response.status(500).send(error);
-    }
-  }
 
-  async showBookingForHCAREDefault({ request, response }) {
-    try {
-      let userBooking = await Database.select(
-        "accounts.hn_number",
-        "first_name",
-        "last_name",
-        "time_in"
-      )
-        .from("users")
-        .innerJoin("accounts", "users.user_id", "accounts.user_id")
-        .innerJoin("bookings", "accounts.hn_number", "bookings.hn_number");
-      console.log("--------------------------------------------------");
-      console.log(userBooking);
-      return userBooking;
-    } catch (error) {
-      return response.status(500).send(error);
-    }
-  }
-
-  // async showBookingForUser({ request, response, params }) {
-  //   try {
-  //     let showbook = await Database.select("*")
-  //       .from("bookings")
-  //       .where({ booking_agent: params.user_id, status:  });
-  //     return showbook;
-  //   } catch (error) {
-  //     response.status(500).send(error);
-  //   }
-  // }
-
+//ยินยันการนัดหมายหลังจากผู้ใช้กดยืนยันจาก e-mail
   async confirmBooking({ request, response }) {
     const query = request.get();
     try {
@@ -241,6 +197,78 @@ class BookingController {
       response.status(500).send(error);
     }
   }
+
+//แสดงตารางนัดหมายตามประเภทและเวลาที่ระบุ
+  async showBookingForHCARE({ request, response, params }) {
+    try {
+      console.log(params.type + " " + params.date);
+      let userBooking = await Database.select(
+        "hn_number",
+        "first_name",
+        "last_name",
+        "time_in",
+        "type_id",
+        "date"
+      )
+        .select(Database.raw('DATE_FORMAT(date, "%d/%m/%Y") as date'))
+        .from("bookings")
+        .innerJoin(
+          "accounts",
+          "bookings.account_id_from_user",
+          "accounts.account_id"
+        )
+        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
+        .where({
+          status: "confirm successful",
+          type_id: params.type,
+          date: params.date
+        });
+      console.log("--------------------------------------------------");
+      console.log(userBooking)
+      console.log(userBooking);
+      return userBooking;
+      return userBooking2;
+    } catch (error) {
+      return response.status(500).send(error);
+    }
+  }
+
+  async showBookingForHCAREDefault({ request, response }) {
+    try {
+      let userBooking = await Database.select(
+        "hn_number",
+        "first_name",
+        "last_name",
+        "time_in",
+        "working_id"
+      )
+        .from("bookings")
+        .innerJoin(
+          "accounts",
+          "bookings.account_id_from_user",
+          "accounts.account_id"
+        )
+        .where({ status: "confirm successful", working_id: 1 });
+      console.log("00000000000000000000000000000000000000000");
+      console.log(userBooking);
+      return userBooking;
+    } catch (error) {
+      return response.status(500).send(error);
+    }
+  }
+
+  // async showBookingForUser({ request, response, params }) {
+  //   try {
+  //     let showbook = await Database.select("*")
+  //       .from("bookings")
+  //       .where({ booking_agent: params.user_id, status:  });
+  //     return showbook;
+  //   } catch (error) {
+  //     response.status(500).send(error);
+  //   }
+  // }
+
+ 
 }
 
 module.exports = BookingController;
