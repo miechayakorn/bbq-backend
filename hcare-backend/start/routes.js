@@ -39,7 +39,7 @@ Route.post("/Booking", "BookingController.submitBooking");
 Route.get("/bookings/:id/confirm", "BookingController.confirmBooking");
 
 //show booking for individual user 
-Route.get("/ShowUserBooking/:user_id", "BookingController.showBookingForUser");
+Route.post("/myappointment", "BookingController.myAppointment");
 
 //show booking for healthcare
 Route.get("/showbooking","BookingController.showBookingForHCAREDefault");

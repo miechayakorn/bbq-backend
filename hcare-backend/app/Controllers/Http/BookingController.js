@@ -5,10 +5,10 @@ const Account = use("App/Models/Account");
 const Database = use("Database");
 const Mail = use("Mail");
 const Hash = use("Hash");
+const Env = use("Env");
 
 class BookingController {
- 
- //แสดงประเภทการนัดหมาย
+  //แสดงประเภทการนัดหมาย
   async showType({ request, response }) {
     try {
       console.log("------------------------------------------------------");
@@ -29,7 +29,7 @@ class BookingController {
     }
   }
 
-//แสดงวันที่ที่นัดประเภทที่เลือกมีให้บริการ
+  //แสดงวันที่ที่นัดประเภทที่เลือกมีให้บริการ
   async showDate({ request, response, params }) {
     try {
       let allBooking = await Database.table("bookings")
@@ -44,7 +44,7 @@ class BookingController {
     }
   }
 
-//แสดงช่วงเวลาที่นัดประเภทที่เลือกและวันที่เลือกมีให้บริการ
+  //แสดงช่วงเวลาที่นัดประเภทที่เลือกและวันที่เลือกมีให้บริการ
   async showTime({ request, response, params }) {
     let data = request.all("time");
     try {
@@ -58,7 +58,7 @@ class BookingController {
     }
   }
 
-//จองตารางนัดหมาย
+  //จองตารางนัดหมาย
   async submitBooking({ request, response }) {
     try {
       const dataFromBooking = request.only([
@@ -115,7 +115,8 @@ class BookingController {
           const dataForSendEmail = {
             account: userAccount,
             bookingSlot: findBooking,
-            token
+            token,
+            url: Env.get("VUE_APP_BACKEND_URL")
           };
 
           console.log(dataForSendEmail);
@@ -124,7 +125,7 @@ class BookingController {
             "Submit Booking From Health Care  " +
             dataForSendEmail.bookingSlot.type_name.toString();
 
-          await Mail.send("email", dataForSendEmail, message => {
+          await Mail.send("confirmbooking", dataForSendEmail, message => {
             message
               .to(userAccount.email)
               .from("Mail from healthcare")
@@ -157,8 +158,7 @@ class BookingController {
     }
   }
 
-
-//ยินยันการนัดหมายหลังจากผู้ใช้กดยืนยันจาก e-mail
+  //ยินยันการนัดหมายหลังจากผู้ใช้กดยืนยันจาก e-mail
   async confirmBooking({ request, response }) {
     const query = request.get();
     try {
@@ -198,7 +198,7 @@ class BookingController {
     }
   }
 
-//แสดงตารางนัดหมายตามประเภทและเวลาที่ระบุ
+  //แสดงตารางนัดหมายตามประเภทและเวลาที่ระบุ
   async showBookingForHCARE({ request, response, params }) {
     try {
       console.log(params.type + " " + params.date);
@@ -224,7 +224,7 @@ class BookingController {
           date: params.date
         });
       console.log("--------------------------------------------------");
-      console.log(userBooking)
+      console.log(userBooking);
       console.log(userBooking);
       return userBooking;
       return userBooking2;
@@ -257,18 +257,40 @@ class BookingController {
     }
   }
 
-  // async showBookingForUser({ request, response, params }) {
-  //   try {
-  //     let showbook = await Database.select("*")
-  //       .from("bookings")
-  //       .where({ booking_agent: params.user_id, status:  });
-  //     return showbook;
-  //   } catch (error) {
-  //     response.status(500).send(error);
-  //   }
-  // }
+  async myAppointment({ request, response }) {
+    try {
+      const dataMyAppoint = request.only(["account_id"]);
+      console.log(dataMyAppoint);
+      const mybooking = await Database.select(
+        "account_id",
+        "hn_number",
+        "first_name",
+        "last_name",
+        "booking_id",
+        "work_times.type_id",
+        "type_name",
+        "date",
+        "time_in"
+      )
+        .from("bookings")
+        .innerJoin(
+          "accounts",
+          "bookings.account_id_from_user",
+          "accounts.account_id"
+        )
+        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
+        .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
+        .where({
+          account_id_from_user: dataMyAppoint.account_id,
+          status: "confirm successful"
+        });
 
- 
+      console.log(mybooking);
+      return mybooking;
+    } catch (error) {
+      response.status(500).send(error);
+    }
+  }
 }
 
 module.exports = BookingController;

@@ -4,6 +4,7 @@ const Account = use("App/Models/Account");
 const Token = use("App/Models/Token");
 const Mail = use("Mail");
 const Hash = use("Hash");
+const Env = use("Env");
 
 class UserRegisterController {
   async createUser({ request, response }) {
@@ -36,13 +37,14 @@ class UserRegisterController {
           account: await Database.table("accounts")
             .where("account_id", accountUser.$attributes.account_id)
             .first(),
-          tokenHash
+          tokenHash,
+          url: Env.get("VUE_APP_BACKEND_URL")
         };
 
         console.log(dataForSendEmail);
 
         const sendMail = await Mail.send(
-          "activateEmail",
+          "activateaccount",
           dataForSendEmail,
           message => {
             message
@@ -95,7 +97,8 @@ class UserRegisterController {
         //   message: "Register successfully",
         //   booking: accountRegisterSuccessfully
         // });
-        return response.redirect("http://localhost:8080/Login");
+
+        return response.redirect(Env.get("VUE_APP_FONTEND_URL") + "/login");
       }
     } else {
       return response.json({
