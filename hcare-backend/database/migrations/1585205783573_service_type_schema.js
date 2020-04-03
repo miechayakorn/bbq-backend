@@ -7,7 +7,8 @@ class ServiceTypeSchema extends Schema {
   up () {
     this.create('servicetypes', (table) => {
       table.increments('type_id').primary() //PK
-      table.string('type_name').notNullable()   
+      table.string('type_name').notNullable()
+      table.boolean('available').defaultTo(true)   
       table.timestamps()
     })
   }

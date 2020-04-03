@@ -11,6 +11,7 @@ class WorkTimeSchema extends Schema {
       table.time("start_time").notNullable();
       table.time("end_time").notNullable();
       table.string("day").nullable();
+      table.boolean('available').defaultTo(true) 
       table.integer("type_id").notNullable(); // [FK]
       table.timestamps();
     });
