@@ -20,7 +20,7 @@ class BookingController {
       for (let index = 0; index < types.length; index++) {
         returnType[index] = {
           type_id: types[index].type_id,
-          type_name: types[index].type_name
+          type_name: types[index].type_name,
         };
       }
       return returnType;
@@ -64,7 +64,7 @@ class BookingController {
       const dataFromBooking = request.only([
         "booking_id",
         "account_id",
-        "symptom"
+        "symptom",
       ]);
       console.log(dataFromBooking);
 
@@ -116,7 +116,7 @@ class BookingController {
             account: userAccount,
             bookingSlot: findBooking,
             token,
-            url: Env.get("VUE_APP_BACKEND_URL")
+            url: Env.get("VUE_APP_BACKEND_URL"),
           };
 
           console.log(dataForSendEmail);
@@ -125,7 +125,7 @@ class BookingController {
             "Submit Booking From Health Care  " +
             dataForSendEmail.bookingSlot.type_name.toString();
 
-          await Mail.send("confirmbooking", dataForSendEmail, message => {
+          await Mail.send("confirmbooking", dataForSendEmail, (message) => {
             message
               .to(userAccount.email)
               .from("Mail from healthcare")
@@ -142,7 +142,7 @@ class BookingController {
               account_id_from_user: dataForSendEmail.account.account_id,
               status: "waitting confirm",
               comment_from_user: dataFromBooking.symptom,
-              token_booking_confirm: token
+              token_booking_confirm: token,
             });
 
           return "send mail success";
@@ -176,21 +176,21 @@ class BookingController {
             .where("booking_id", booking.booking_id)
             .update({
               status: "confirm successful",
-              token_booking_confirm: null
+              token_booking_confirm: null,
             });
 
           const bookingNew = await Booking.find(booking.booking_id);
 
           return response.json({
             message: "booking confirm successful!",
-            booking: bookingNew
+            booking: bookingNew,
           });
         } else {
           return "This booking has been confirmed";
         }
       } else {
         return response.json({
-          message: "token not exist"
+          message: "token not exist",
         });
       }
     } catch (error) {
@@ -203,6 +203,7 @@ class BookingController {
     try {
       console.log(params.type + " " + params.date);
       let userBooking = await Database.select(
+        "booking_id",
         "hn_number",
         "first_name",
         "last_name",
@@ -221,7 +222,7 @@ class BookingController {
         .where({
           status: "confirm successful",
           type_id: params.type,
-          date: params.date
+          date: params.date,
         });
       console.log("--------------------------------------------------");
       console.log(userBooking);
@@ -233,6 +234,7 @@ class BookingController {
     }
   }
 
+  //ยังไม่ได้ใช้งาน
   async showBookingForHCAREDefault({ request, response }) {
     try {
       let userBooking = await Database.select(
@@ -257,6 +259,7 @@ class BookingController {
     }
   }
 
+  //show appointment for patient
   async myAppointment({ request, response }) {
     try {
       const dataMyAppoint = request.only(["account_id"]);
@@ -282,7 +285,41 @@ class BookingController {
         .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
         .where({
           account_id_from_user: dataMyAppoint.account_id,
-          status: "confirm successful"
+          status: "confirm successful",
+        });
+
+      console.log(mybooking);
+      return mybooking;
+    } catch (error) {
+      response.status(500).send(error);
+    }
+  }
+  async editPatientBooking({ request, response }) {
+    try {
+      const dataEditPatientBook = request.only(["booking_id", "link", "note"]);
+      console.log(dataEditPatientBook);
+      const mybooking = await Database.select(
+        "account_id",
+        "hn_number",
+        "first_name",
+        "last_name",
+        "booking_id",
+        "work_times.type_id",
+        "type_name",
+        "date",
+        "time_in"
+      )
+        .from("bookings")
+        .innerJoin(
+          "accounts",
+          "bookings.account_id_from_user",
+          "accounts.account_id"
+        )
+        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
+        .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
+        .where({
+          account_id_from_user: dataMyAppoint.account_id,
+          status: "confirm successful",
         });
 
       console.log(mybooking);

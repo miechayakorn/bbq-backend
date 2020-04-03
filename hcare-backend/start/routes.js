@@ -41,8 +41,9 @@ Route.get("/bookings/:id/confirm", "BookingController.confirmBooking");
 //show booking for individual user 
 Route.post("/myappointment", "BookingController.myAppointment");
 
-//show booking for healthcare
+//Dashboard
 Route.get("/showbooking","BookingController.showBookingForHCAREDefault");
 Route.get("/showbooking/:type/:date","BookingController.showBookingForHCARE");
+Route.post('/patientbooking','BookingController.editPatientBooking')
 
 
