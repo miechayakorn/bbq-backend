@@ -38,12 +38,13 @@ Route.get("/ServiceTime/:type_id", "BookingController.showTime");
 Route.post("/Booking", "BookingController.submitBooking");
 Route.get("/bookings/:id/confirm", "BookingController.confirmBooking");
 
-//show booking for individual user 
+//show booking for individual user
 Route.post("/myappointment", "BookingController.myAppointment");
+Route.get('/appointment/detail/:booking_id','BookingController.myAppointmentDetail')
 
 //Dashboard
-Route.get("/showbooking","BookingController.showBookingForHCAREDefault");
-Route.get("/showbooking/:type/:date","BookingController.showBookingForHCARE");
-Route.post('/patientbooking','BookingController.editPatientBooking')
-
+Route.get("/showbooking", "BookingController.showBookingForHCAREDefault");
+Route.get("/showbooking/:type/:date", "BookingController.showBookingForHCARE");
+Route.get('/patientbooking/:booking_id',"BookingController.patientBooking")
+Route.post("/patientbooking/edit", "BookingController.editPatientBooking");
 

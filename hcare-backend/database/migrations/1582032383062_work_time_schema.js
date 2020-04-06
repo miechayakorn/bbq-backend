@@ -13,6 +13,7 @@ class WorkTimeSchema extends Schema {
       table.string("day").nullable();
       table.boolean('available').defaultTo(true) 
       table.integer("type_id").notNullable(); // [FK]
+      table.integer("doctor_id").nullable(); // [FK]
       table.timestamps();
     });
   }

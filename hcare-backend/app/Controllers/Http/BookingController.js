@@ -235,29 +235,29 @@ class BookingController {
   }
 
   //ยังไม่ได้ใช้งาน
-  async showBookingForHCAREDefault({ request, response }) {
-    try {
-      let userBooking = await Database.select(
-        "hn_number",
-        "first_name",
-        "last_name",
-        "time_in",
-        "working_id"
-      )
-        .from("bookings")
-        .innerJoin(
-          "accounts",
-          "bookings.account_id_from_user",
-          "accounts.account_id"
-        )
-        .where({ status: "confirm successful", working_id: 1 });
-      console.log("00000000000000000000000000000000000000000");
-      console.log(userBooking);
-      return userBooking;
-    } catch (error) {
-      return response.status(500).send(error);
-    }
-  }
+  // async showBookingForHCAREDefault({ request, response }) {
+  //   try {
+  //     let userBooking = await Database.select(
+  //       "hn_number",
+  //       "first_name",
+  //       "last_name",
+  //       "time_in",
+  //       "working_id"
+  //     )
+  //       .from("bookings")
+  //       .innerJoin(
+  //         "accounts",
+  //         "bookings.account_id_from_user",
+  //         "accounts.account_id"
+  //       )
+  //       .where({ status: "confirm successful", working_id: 1 });
+  //     console.log("00000000000000000000000000000000000000000");
+  //     console.log(userBooking);
+  //     return userBooking;
+  //   } catch (error) {
+  //     return response.status(500).send(error);
+  //   }
+  // }
 
   //show appointment for patient
   async myAppointment({ request, response }) {
@@ -294,11 +294,63 @@ class BookingController {
       response.status(500).send(error);
     }
   }
+
+  //
+  // async patientBooking({ request, response, params }) {
+  //   try {
+  //     let booking = await Booking.find(params.booking_id);
+  //     if (booking) {
+  //       response.json({
+  //         booking,
+  //       });
+  //     } else {
+  //       response.status(204).send("Have no booking");
+  //     }
+  //   } catch (error) {
+  //     response.status(500).send(error);
+  //   }
+  // }
+
   async editPatientBooking({ request, response }) {
     try {
-      const dataEditPatientBook = request.only(["booking_id", "link", "note"]);
+      const dataEditPatientBook = request.all(["booking_id", "link", "note"]);
       console.log(dataEditPatientBook);
-      const mybooking = await Database.select(
+
+      const booking = await Booking.find(dataEditPatientBook.booking_id);
+      if (booking) {
+        console.log("++++++++++++++++++++++++++++++++++++++++++++++++");
+        await Booking.query().where("booking_id", booking.booking_id).update({
+          link_meeting: dataEditPatientBook.link,
+          comment_from_staff: dataEditPatientBook.note,
+        });
+        let returnBooking = await Booking.find(booking.booking_id);
+        return response.json({
+          message: "booking update successful!",
+          booking: returnBooking,
+        });
+      } else {
+        return "Have no this booking";
+      }
+    } catch (error) {
+      response.status(500).send(error);
+    }
+  }
+
+  async myAppointmentDetail({ request, response, params }) {
+    try {
+      console.log(params.booking_id);
+
+      const doctor = await Database.select(
+        "account_id AS doctor_id",
+        "first_name AS doctor_firstname",
+        "last_name AS doctor_lastname"
+      )
+        .from("bookings")
+        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
+        .innerJoin("accounts", "work_times.doctor_id", "accounts.account_id")
+        .where({ booking_id: params.booking_id, role: "doctor" }).first();
+
+      const booking = await Database.select(
         "account_id",
         "hn_number",
         "first_name",
@@ -307,7 +359,8 @@ class BookingController {
         "work_times.type_id",
         "type_name",
         "date",
-        "time_in"
+        "time_in",
+        "link_meeting"
       )
         .from("bookings")
         .innerJoin(
@@ -318,12 +371,33 @@ class BookingController {
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
         .where({
-          account_id_from_user: dataMyAppoint.account_id,
+          booking_id: params.booking_id,
           status: "confirm successful",
-        });
+        }).first();
 
-      console.log(mybooking);
-      return mybooking;
+      // const sendBooking = {
+      //   account_id: booking.account_id,
+      //   hn_number: booking.hn_number,
+      //   first_name: booking.first_name,
+      //   last_name: booking.last_name,
+      //   booking_id: booking.booking_id,
+      //   working_id: booking.working_id,
+      //   work_times: booking.work_times,
+      //   type_name: booking.type_name,
+      //   date: booking.date,
+      //   time: booking.time,
+      //   link_meeting: booking.link_meeting,
+      //   doctor_id: doctor.account_id,
+      //   doctor_fitstname: doctor.first_name,
+      //   doctor_lastname: doctor.last_name,
+      // };
+      
+     
+      const sendBooking = {...booking,...doctor}
+      
+      console.log(sendBooking);
+
+      return sendBooking;
     } catch (error) {
       response.status(500).send(error);
     }
