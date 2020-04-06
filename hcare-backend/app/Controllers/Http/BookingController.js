@@ -287,8 +287,12 @@ class BookingController {
           account_id_from_user: dataMyAppoint.account_id,
           status: "confirm successful",
         });
-
       console.log(mybooking);
+
+      if (!mybooking[0]) {
+        response.status(204).send();
+      }
+
       return mybooking;
     } catch (error) {
       response.status(500).send(error);
@@ -348,7 +352,8 @@ class BookingController {
         .from("bookings")
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .innerJoin("accounts", "work_times.doctor_id", "accounts.account_id")
-        .where({ booking_id: params.booking_id, role: "doctor" }).first();
+        .where({ booking_id: params.booking_id, role: "doctor" })
+        .first();
 
       const booking = await Database.select(
         "account_id",
@@ -373,7 +378,8 @@ class BookingController {
         .where({
           booking_id: params.booking_id,
           status: "confirm successful",
-        }).first();
+        })
+        .first();
 
       // const sendBooking = {
       //   account_id: booking.account_id,
@@ -391,10 +397,9 @@ class BookingController {
       //   doctor_fitstname: doctor.first_name,
       //   doctor_lastname: doctor.last_name,
       // };
-      
-     
-      const sendBooking = {...booking,...doctor}
-      
+
+      const sendBooking = { ...booking, ...doctor };
+
       console.log(sendBooking);
 
       return sendBooking;
