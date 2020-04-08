@@ -7,6 +7,8 @@ const Hash = use("Hash");
 const Env = use("Env");
 
 class UserRegisterController {
+
+  // create user and sendmail to confirm
   async createUser({ request, response }) {
     try {
       const data = request.only([
@@ -53,8 +55,6 @@ class UserRegisterController {
               .subject("Activate Register From Health Care");
           }
         );
-
-        console.log("00000000000000000000000000000000000000000000");
         console.log(sendMail);
 
         if (sendMail) {
@@ -76,12 +76,11 @@ class UserRegisterController {
     }
   }
 
+  // confirm after click in email
   async confirmRegister({ request, response }) {
     const query = request.get();
     if (query.token) {
       const accountConfirm = await Token.findBy("token", query.token);
-
-      console.log("---------------------------------------------");
       console.log(accountConfirm);
 
       if (accountConfirm) {

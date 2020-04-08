@@ -11,10 +11,10 @@ class BookingController {
   //แสดงประเภทการนัดหมาย
   async showType({ request, response }) {
     try {
-      console.log("------------------------------------------------------");
       // let types = await ServiceType.all(); // fatch all record from types table
       // console.log(types);
       // let typeJSON = types.toJSON(); // parse to json
+
       let types = await Database.from("servicetypes");
       const returnType = []; // return to fontend type_id and type_name only
       for (let index = 0; index < types.length; index++) {
@@ -101,7 +101,7 @@ class BookingController {
 
       if (userAccount) {
         // check account not null
-        console.log("+++++++++++++++++++++++++++++");
+
         if (!findBooking.status) {
           // check booking status available
 
@@ -131,10 +131,6 @@ class BookingController {
               .from("Mail from healthcare")
               .subject(subject);
           });
-
-          console.log(
-            "000000000000000000000000000000000000000000000000000000000"
-          );
 
           await Database.table("bookings")
             .where("booking_id", dataFromBooking.booking_id)
@@ -204,6 +200,7 @@ class BookingController {
       console.log(params.type + " " + params.date);
       let userBooking = await Database.select(
         "booking_id",
+        "account_id",
         "hn_number",
         "first_name",
         "last_name",
@@ -234,32 +231,34 @@ class BookingController {
     }
   }
 
-  //ยังไม่ได้ใช้งาน
-  // async showBookingForHCAREDefault({ request, response }) {
-  //   try {
-  //     let userBooking = await Database.select(
-  //       "hn_number",
-  //       "first_name",
-  //       "last_name",
-  //       "time_in",
-  //       "working_id"
-  //     )
-  //       .from("bookings")
-  //       .innerJoin(
-  //         "accounts",
-  //         "bookings.account_id_from_user",
-  //         "accounts.account_id"
-  //       )
-  //       .where({ status: "confirm successful", working_id: 1 });
-  //     console.log("00000000000000000000000000000000000000000");
-  //     console.log(userBooking);
-  //     return userBooking;
-  //   } catch (error) {
-  //     return response.status(500).send(error);
-  //   }
-  // }
+  /*เพิ่ม link และ note สำหรับ Health care*/
 
-  //show appointment for patient
+  async editPatientBooking({ request, response }) {
+    try {
+      const dataEditPatientBook = request.all(["booking_id", "link", "note"]);
+      console.log(dataEditPatientBook);
+
+      const booking = await Booking.find(dataEditPatientBook.booking_id);
+      if (booking) {
+        console.log("++++++++++++++++++++++++++++++++++++++++++++++++");
+        await Booking.query().where("booking_id", booking.booking_id).update({
+          link_meeting: dataEditPatientBook.link,
+          comment_from_staff: dataEditPatientBook.note,
+        });
+        let returnBooking = await Booking.find(booking.booking_id);
+        return response.json({
+          message: "booking update successful!",
+          booking: returnBooking,
+        });
+      } else {
+        return "Have no this booking";
+      }
+    } catch (error) {
+      response.status(500).send(error);
+    }
+  }
+
+  /*show appointment for patient*/
   async myAppointment({ request, response }) {
     try {
       const dataMyAppoint = request.only(["account_id"]);
@@ -299,51 +298,12 @@ class BookingController {
     }
   }
 
-  //
-  // async patientBooking({ request, response, params }) {
-  //   try {
-  //     let booking = await Booking.find(params.booking_id);
-  //     if (booking) {
-  //       response.json({
-  //         booking,
-  //       });
-  //     } else {
-  //       response.status(204).send("Have no booking");
-  //     }
-  //   } catch (error) {
-  //     response.status(500).send(error);
-  //   }
-  // }
-
-  async editPatientBooking({ request, response }) {
-    try {
-      const dataEditPatientBook = request.all(["booking_id", "link", "note"]);
-      console.log(dataEditPatientBook);
-
-      const booking = await Booking.find(dataEditPatientBook.booking_id);
-      if (booking) {
-        console.log("++++++++++++++++++++++++++++++++++++++++++++++++");
-        await Booking.query().where("booking_id", booking.booking_id).update({
-          link_meeting: dataEditPatientBook.link,
-          comment_from_staff: dataEditPatientBook.note,
-        });
-        let returnBooking = await Booking.find(booking.booking_id);
-        return response.json({
-          message: "booking update successful!",
-          booking: returnBooking,
-        });
-      } else {
-        return "Have no this booking";
-      }
-    } catch (error) {
-      response.status(500).send(error);
-    }
-  }
-
+  //หน้า appointment detail เมื่อคลิกที่ card
   async myAppointmentDetail({ request, response, params }) {
     try {
       console.log(params.booking_id);
 
+      //find doctor in account table
       const doctor = await Database.select(
         "account_id AS doctor_id",
         "first_name AS doctor_firstname",
@@ -355,6 +315,7 @@ class BookingController {
         .where({ booking_id: params.booking_id, role: "doctor" })
         .first();
 
+      // find booking and personal data of patient
       const booking = await Database.select(
         "account_id",
         "hn_number",
@@ -381,23 +342,6 @@ class BookingController {
         })
         .first();
 
-      // const sendBooking = {
-      //   account_id: booking.account_id,
-      //   hn_number: booking.hn_number,
-      //   first_name: booking.first_name,
-      //   last_name: booking.last_name,
-      //   booking_id: booking.booking_id,
-      //   working_id: booking.working_id,
-      //   work_times: booking.work_times,
-      //   type_name: booking.type_name,
-      //   date: booking.date,
-      //   time: booking.time,
-      //   link_meeting: booking.link_meeting,
-      //   doctor_id: doctor.account_id,
-      //   doctor_fitstname: doctor.first_name,
-      //   doctor_lastname: doctor.last_name,
-      // };
-
       const sendBooking = { ...booking, ...doctor };
 
       console.log(sendBooking);
@@ -407,6 +351,80 @@ class BookingController {
       response.status(500).send(error);
     }
   }
+
+  // หน้า Dashboard เมิ่อกดที่ผู้ป่วยจะแสดงข้อมูล
+  async patientDetail({ request, response, params }) {
+    try {
+      console.log(params);
+      const patientDetail = await Database.select(
+        "booking_id",
+        "account_id",
+        "hn_number",
+        "first_name",
+        "last_name",
+        "email",
+        "telephone",
+        "comment_from_user"
+      )
+        .from("bookings")
+        .innerJoin(
+          "accounts",
+          "bookings.account_id_from_user",
+          "accounts.account_id"
+        )
+        .where({ booking_id: params.booking_id })
+        .first();
+      console.log(patientDetail);
+      if (patientDetail) {
+        return patientDetail;
+      } else {
+        response.status(204).send();
+      }
+    } catch (error) {
+      response.status(500).send(error);
+    }
+  }
+
+  /*ยังไม่ได้ใช้งาน
+  async showBookingForHCAREDefault({ request, response }) {
+    try {
+      let userBooking = await Database.select(
+        "hn_number",
+        "first_name",
+        "last_name",
+        "time_in",
+        "working_id"
+      )
+        .from("bookings")
+        .innerJoin(
+          "accounts",
+          "bookings.account_id_from_user",
+          "accounts.account_id"
+        )
+        .where({ status: "confirm successful", working_id: 1 });
+      console.log("00000000000000000000000000000000000000000");
+      console.log(userBooking);
+      return userBooking;
+    } catch (error) {
+      return response.status(500).send(error);
+    }
+  }*/
+
+  /*ไม่ได้ใช้งาน
+  async patientBooking({ request, response, params }) {
+    try {
+      let booking = await Booking.find(params.booking_id);
+      if (booking) {
+        response.json({
+          booking,
+        });
+      } else {
+        response.status(204).send("Have no booking");
+      }
+    } catch (error) {
+      response.status(500).send(error);
+    }
+  }*/
 }
 
 module.exports = BookingController;

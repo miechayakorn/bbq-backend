@@ -47,4 +47,5 @@ Route.get("/showbooking", "BookingController.showBookingForHCAREDefault");
 Route.get("/showbooking/:type/:date", "BookingController.showBookingForHCARE");
 Route.get('/patientbooking/:booking_id',"BookingController.patientBooking")
 Route.post("/patientbooking/edit", "BookingController.editPatientBooking");
+Route.get('/patientbooking/detail/:booking_id','BookingController.patientDetail')
 
