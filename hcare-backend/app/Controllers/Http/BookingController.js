@@ -197,14 +197,14 @@ class BookingController {
   //แสดงตารางนัดหมายตามประเภทและเวลาที่ระบุ
   async showBookingForHCARE({ request, response, params }) {
     try {
-      console.log(params.type + " " + params.date);
-      let userBooking = await Database.select(
+      
+      const userBooking = await Database.select(
         "booking_id",
         "account_id",
-        "hn_number",
-        "first_name",
-        "last_name",
-        "time_in",
+        "hn_number AS HN number ",
+        "first_name AS ชื่อ",
+        "last_name AS นามสกุล",
+        "time_in AS เวลานัด",
         "type_id",
         "date"
       )
@@ -221,8 +221,7 @@ class BookingController {
           type_id: params.type,
           date: params.date,
         });
-      console.log("--------------------------------------------------");
-      console.log(userBooking);
+      
       console.log(userBooking);
       return userBooking;
       return userBooking2;
