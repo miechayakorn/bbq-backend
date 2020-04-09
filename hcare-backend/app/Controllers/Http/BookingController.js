@@ -206,7 +206,10 @@ class BookingController {
         "last_name AS นามสกุล",
         "time_in AS เวลานัด",
         "type_id",
-        "date"
+        "date",
+        "email",
+        "telephone",
+        "comment_from_user as symptom"
       )
         .select(Database.raw('DATE_FORMAT(date, "%d/%m/%Y") as date'))
         .from("bookings")
@@ -351,7 +354,7 @@ class BookingController {
     }
   }
 
-  // หน้า Dashboard เมิ่อกดที่ผู้ป่วยจะแสดงข้อมูล
+  // หน้า Dashboard เมิ่อกดที่ผู้ป่วยจะแสดงข้อมูล //ไม่ได้ใช้
   async patientDetail({ request, response, params }) {
     try {
       console.log(params);
