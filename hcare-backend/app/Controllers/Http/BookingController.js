@@ -201,7 +201,7 @@ class BookingController {
       const userBooking = await Database.select(
         "booking_id",
         "account_id",
-        "hn_number AS HN number ",
+        "hn_number AS HNnumber ",
         "first_name AS ชื่อ",
         "last_name AS นามสกุล",
         "time_in AS เวลานัด",
