@@ -208,7 +208,8 @@ class BookingController {
         "date",
         "email",
         "telephone",
-        "comment_from_user as symptom"
+        "comment_from_user as symptom",
+        "link_meeting"
       )
         .select(Database.raw('DATE_FORMAT(date, "%d/%m/%Y") as date'))
         .from("bookings")
@@ -398,7 +399,7 @@ class BookingController {
   async cancelAppointment({ request, response }) {
     try {
       const dataCancel = await request.only(["booking_id"]);
-      console.log(dataCancel)
+      console.log(dataCancel);
       const booking = await Booking.find(dataCancel.booking_id);
       if (booking) {
         await Booking.query()
@@ -453,7 +454,7 @@ class BookingController {
   }*/
 
   //ไม่ได้ใช้งาน
- /* async patientBooking({ request, response, params }) {
+  /* async patientBooking({ request, response, params }) {
     try {
       let booking = await Booking.find(params.booking_id);
       if (booking) {
