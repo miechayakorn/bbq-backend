@@ -40,12 +40,18 @@ Route.get("/bookings/:id/confirm", "BookingController.confirmBooking");
 
 //show booking for individual user
 Route.post("/myappointment", "BookingController.myAppointment");
-Route.get('/appointment/detail/:booking_id','BookingController.myAppointmentDetail')
+Route.get(
+  "/appointment/detail/:booking_id",
+  "BookingController.myAppointmentDetail"
+);
 
 //Dashboard
 Route.get("/showbooking", "BookingController.showBookingForHCAREDefault");
 Route.get("/showbooking/:type/:date", "BookingController.showBookingForHCARE");
-Route.get('/patientbooking/:booking_id',"BookingController.patientBooking")
+Route.get("/patientbooking/:booking_id", "BookingController.patientBooking");
 Route.post("/patientbooking/edit", "BookingController.editPatientBooking");
-Route.get('/patientbooking/detail/:booking_id','BookingController.patientDetail')
-
+Route.post("/cancel", "BookingController.cancelAppointment");
+Route.get(
+  "/patientbooking/detail/:booking_id",
+  "BookingController.patientDetail"
+);

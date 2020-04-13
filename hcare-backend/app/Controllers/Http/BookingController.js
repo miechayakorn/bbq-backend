@@ -197,7 +197,6 @@ class BookingController {
   //แสดงตารางนัดหมายตามประเภทและเวลาที่ระบุ
   async showBookingForHCARE({ request, response, params }) {
     try {
-      
       const userBooking = await Database.select(
         "booking_id",
         "account_id",
@@ -224,7 +223,7 @@ class BookingController {
           type_id: params.type,
           date: params.date,
         });
-      
+
       console.log(userBooking);
       return userBooking;
       return userBooking2;
@@ -234,7 +233,6 @@ class BookingController {
   }
 
   /*เพิ่ม link และ note สำหรับ Health care*/
-
   async editPatientBooking({ request, response }) {
     try {
       const dataEditPatientBook = request.all(["booking_id", "link", "note"]);
@@ -242,11 +240,20 @@ class BookingController {
 
       const booking = await Booking.find(dataEditPatientBook.booking_id);
       if (booking) {
-        console.log("++++++++++++++++++++++++++++++++++++++++++++++++");
-        await Booking.query().where("booking_id", booking.booking_id).update({
-          link_meeting: dataEditPatientBook.link,
-          comment_from_staff: dataEditPatientBook.note,
-        });
+        if (dataEditPatientBook.link && dataEditPatientBook.note) {
+          await Booking.query().where("booking_id", booking.booking_id).update({
+            link_meeting: dataEditPatientBook.link,
+            comment_from_staff: dataEditPatientBook.note,
+          });
+        } else if (dataEditPatientBook.note) {
+          await Booking.query().where("booking_id", booking.booking_id).update({
+            comment_from_staff: dataEditPatientBook.note,
+          });
+        } else if (dataEditPatientBook.link) {
+          await Booking.query().where("booking_id", booking.booking_id).update({
+            link_meeting: dataEditPatientBook.link,
+          });
+        }
         let returnBooking = await Booking.find(booking.booking_id);
         return response.json({
           message: "booking update successful!",
@@ -355,7 +362,7 @@ class BookingController {
   }
 
   // หน้า Dashboard เมิ่อกดที่ผู้ป่วยจะแสดงข้อมูล //ไม่ได้ใช้
-  async patientDetail({ request, response, params }) {
+  /*async patientDetail({ request, response, params }) {
     try {
       console.log(params);
       const patientDetail = await Database.select(
@@ -385,10 +392,43 @@ class BookingController {
     } catch (error) {
       response.status(500).send(error);
     }
+  }*/
+
+  //ยกเลิกการจองนัดของผู้ป่วยผ่านหน้า Dashboard
+  async cancelAppointment({ request, response }) {
+    try {
+      const dataCancel = await request.only(["booking_id"]);
+      console.log(dataCancel)
+      const booking = await Booking.find(dataCancel.booking_id);
+      if (booking) {
+        await Booking.query()
+          .where("booking_id", dataCancel.booking_id)
+          .update({
+            status: null,
+            comment_from_user: null,
+            comment_from_staff: null,
+            token_booking_confirm: null,
+            link_meeting: null,
+            account_id_from_user: null,
+          });
+        const bookingUpdate = await Database.from("bookings").where(
+          "booking_id",
+          booking.booking_id
+        );
+        return response.json({
+          message: "clear schedule successful",
+          booking: bookingUpdate,
+        });
+      } else {
+        return "Have no booking in database";
+      }
+    } catch (error) {
+      response.status(500).send(error);
+    }
   }
 
-  /*ยังไม่ได้ใช้งาน
-  async showBookingForHCAREDefault({ request, response }) {
+  //ยังไม่ได้ใช้งาน
+  /*async showBookingForHCAREDefault({ request, response }) {
     try {
       let userBooking = await Database.select(
         "hn_number",
@@ -412,8 +452,8 @@ class BookingController {
     }
   }*/
 
-  /*ไม่ได้ใช้งาน
-  async patientBooking({ request, response, params }) {
+  //ไม่ได้ใช้งาน
+ /* async patientBooking({ request, response, params }) {
     try {
       let booking = await Booking.find(params.booking_id);
       if (booking) {
