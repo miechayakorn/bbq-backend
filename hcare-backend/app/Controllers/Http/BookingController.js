@@ -35,7 +35,7 @@ class BookingController {
       let allBooking = await Database.table("bookings")
         .select("type_id", "date")
         .distinct("date")
-        .select(Database.raw('DATE_FORMAT(date, "%Y-%m-%d") as date'))
+        .select(Database.raw('DATE_FORMAT(date, "%W %d %m %Y") as date'))
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .where({ type_id: params.type_id });
       return allBooking;
