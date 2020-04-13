@@ -209,7 +209,8 @@ class BookingController {
         "email",
         "telephone",
         "comment_from_user as symptom",
-        "link_meeting"
+        "link_meeting",
+        "comment_from_staff"
       )
         .select(Database.raw('DATE_FORMAT(date, "%d/%m/%Y") as date'))
         .from("bookings")
