@@ -5,15 +5,13 @@ const Database = use("Database");
 
 class AuthController {
   async authenticate({ request, auth, response }) {
-    const { hn_number, password } = request.only(["hn_number", "password"]);
+    const { email, password } = request.only(["email", "password"]);
 
-    console.log(hn_number, password);
+    console.log(email, password);
     try {
-      if (await auth.attempt(hn_number, password)) {
-        let account = await Account.findBy("hn_number", hn_number);
-
+      if (await auth.attempt(email, password)) {
+        let account = await Account.findBy("email", email);
         let token = await auth.generate(account);
-
         let dataResp = {
           account_id: account.account_id,
           hn_number: account.hn_number,
@@ -28,7 +26,7 @@ class AuthController {
 
           type: token.type,
           token: token.token,
-          refreshToken: token.refreshToken
+          refreshToken: token.refreshToken,
         };
 
         return response.json(dataResp);

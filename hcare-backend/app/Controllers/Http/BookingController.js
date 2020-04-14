@@ -42,7 +42,7 @@ class BookingController {
       const allBooking2 = await Database.table("bookings")
         .select("date")
         .distinct("date")
-        .select(Database.raw('DATE_FORMAT(date, "%W %d %m %Y") as dateformat'))
+        .select(Database.raw('DATE_FORMAT(date, "%W %d-%m-%Y") as dateformat'))
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .where({ type_id: params.type_id });
 
@@ -71,7 +71,7 @@ class BookingController {
     }
   }
 
-  //จองตารางนัดหมาย
+  //จองตารางนัดหมาย และส่ง e-mail
   async submitBooking({ request, response }) {
     try {
       const dataFromBooking = request.only([
@@ -103,7 +103,7 @@ class BookingController {
         "date",
         "status"
       )
-        .select(Database.raw('DATE_FORMAT(date, "%d-%m-%Y") as date'))
+        .select(Database.raw('DATE_FORMAT(date, "%W %d-%m-%Y") as date'))
         .from("bookings")
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
@@ -298,6 +298,7 @@ class BookingController {
         "date",
         "time_in"
       )
+        .select(Database.raw('DATE_FORMAT(date, "%W %d-%m-%Y") as date'))
         .from("bookings")
         .innerJoin(
           "accounts",
@@ -352,6 +353,7 @@ class BookingController {
         "time_in",
         "link_meeting"
       )
+        .select(Database.raw('DATE_FORMAT(date, "%W %d-%m-%Y") as date'))
         .from("bookings")
         .innerJoin(
           "accounts",
