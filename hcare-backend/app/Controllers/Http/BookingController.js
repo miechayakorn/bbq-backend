@@ -129,7 +129,7 @@ class BookingController {
             account: userAccount,
             bookingSlot: findBooking,
             token,
-            url: Env.get("VUE_APP_BACKEND_URL"),
+            url: Env.get("VUE_APP_FONTEND_URL"),
           };
 
           console.log(dataForSendEmail);

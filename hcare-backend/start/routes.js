@@ -36,7 +36,7 @@ Route.get("/ServiceTypes", "BookingController.showType");
 Route.get("/ServiceDate/:type_id", "BookingController.showDate");
 Route.get("/ServiceTime/:type_id", "BookingController.showTime");
 Route.post("/Booking", "BookingController.submitBooking");
-Route.get("/bookings/:id/confirm", "BookingController.confirmBooking");
+Route.get("/bookings/confirm", "BookingController.confirmBooking");
 
 //show booking for individual user
 Route.post("/myappointment", "BookingController.myAppointment");
