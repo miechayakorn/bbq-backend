@@ -21,7 +21,7 @@ Route.on("/").render("welcome");
 
 //user register & login
 Route.post("/register", "UserRegisterController.createUser");
-Route.get("/confirmregister", "UserRegisterController.confirmRegister");
+Route.get("/register/confirm", "UserRegisterController.confirmRegister");
 Route.post("/login", "AuthController.authenticate");
 
 //staff register

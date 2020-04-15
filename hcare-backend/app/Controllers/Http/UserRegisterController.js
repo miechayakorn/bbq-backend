@@ -7,7 +7,6 @@ const Hash = use("Hash");
 const Env = use("Env");
 
 class UserRegisterController {
-
   // create user and sendmail to confirm
   async createUser({ request, response }) {
     try {
@@ -17,7 +16,7 @@ class UserRegisterController {
         "email",
         "telephone",
         "first_name",
-        "last_name"
+        "last_name",
       ]);
 
       console.log(data);
@@ -29,7 +28,7 @@ class UserRegisterController {
         last_name: data.last_name,
         role: "user",
         email: data.email,
-        telephone: data.telephone
+        telephone: data.telephone,
       });
 
       if (accountUser) {
@@ -40,7 +39,7 @@ class UserRegisterController {
             .where("account_id", accountUser.$attributes.account_id)
             .first(),
           tokenHash,
-          url: Env.get("VUE_APP_BACKEND_URL")
+          url: Env.get("VUE_APP_FONTEND_URL"),
         };
 
         console.log(dataForSendEmail);
@@ -48,7 +47,7 @@ class UserRegisterController {
         const sendMail = await Mail.send(
           "activateaccount",
           dataForSendEmail,
-          message => {
+          (message) => {
             message
               .to(dataForSendEmail.account.email)
               .from("Mail from healthcare")
@@ -61,7 +60,7 @@ class UserRegisterController {
           const createTokenDB = await Token.create({
             account_id: dataForSendEmail.account.account_id,
             token: tokenHash,
-            type: "Register"
+            type: "Register",
           });
 
           console.log(createTokenDB);
@@ -91,17 +90,13 @@ class UserRegisterController {
         const accountRegisterSuccessfully = await Account.find(
           accountConfirm.account_id
         );
-
-        // return response.json({
-        //   message: "Register successfully",
-        //   booking: accountRegisterSuccessfully
-        // });
-
-        return response.redirect(Env.get("VUE_APP_FONTEND_URL") + "/login");
+        return response
+          .json("")
+          .redirect(Env.get("VUE_APP_FONTEND_URL") + "/login");
       }
     } else {
       return response.json({
-        message: "token not exist"
+        message: "token not exist",
       });
     }
   }
