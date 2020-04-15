@@ -195,15 +195,15 @@ class BookingController {
             booking: bookingNew,
           });
         } else {
-          return "This booking has been confirmed";
+          return response.status(304).json({
+            message: "This booking has been confirmed",
+          });
         }
       } else {
-        return response.json({
-          message: "token not exist",
-        });
+        return response.status(500).send("token not exist");
       }
     } catch (error) {
-      response.status(500).send(error);
+      return response.status(500).send(error);
     }
   }
 

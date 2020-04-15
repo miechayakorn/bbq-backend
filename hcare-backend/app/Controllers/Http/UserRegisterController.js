@@ -68,7 +68,7 @@ class UserRegisterController {
 
           return "sendmail success";
         } else {
-          return " cannot sendmail ";
+          return response.status(500).send("cannot sendmail");
         }
       }
     } catch (err) {
