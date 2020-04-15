@@ -24,8 +24,8 @@ Route.post("/register", "UserRegisterController.createUser");
 Route.get("/confirmregister", "UserRegisterController.confirmRegister");
 Route.post("/login", "AuthController.authenticate");
 
-// //staff register
-// Route.post("/staffRegister", "RegisterController.createStaff");
+//staff register
+Route.post("/staffRegister", "StaffRegisterController.createStaff");
 
 Route.post("createtype", "CreateTypeController.create");
 Route.post("updatetype", "CreateTypeController.update");
