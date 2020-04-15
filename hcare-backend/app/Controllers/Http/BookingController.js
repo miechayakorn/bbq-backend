@@ -191,16 +191,16 @@ class BookingController {
           const bookingNew = await Booking.find(booking.booking_id);
 
           return response.json({
-            message: "booking confirm successful!",
+            message: "Booking confirmation successful",
             booking: bookingNew,
           });
         } else {
           return response.status(304).json({
-            message: "This booking has been confirmed",
+            message: "This token is not available",
           });
         }
       } else {
-        return response.status(500).send("token not exist");
+        return response.status(500).send("Token not exist");
       }
     } catch (error) {
       return response.status(500).send(error);

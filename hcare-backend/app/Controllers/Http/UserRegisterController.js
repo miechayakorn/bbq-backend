@@ -78,26 +78,34 @@ class UserRegisterController {
   // confirm after click in email
   async confirmRegister({ request, response }) {
     const query = request.get();
-    if (query.token) {
-      const accountConfirm = await Token.findBy("token", query.token);
-      console.log(accountConfirm);
+    try {
+      if (query.token) {
+        const accountConfirm = await Token.findBy("token", query.token);
+        console.log(accountConfirm);
 
-      if (accountConfirm) {
-        await Account.query()
-          .where("account_id", accountConfirm.account_id)
-          .update({ verify: true });
+        if (accountConfirm) {
+          await Account.query()
+            .where("account_id", accountConfirm.account_id)
+            .update({ verify: true });
 
-        const accountRegisterSuccessfully = await Account.find(
-          accountConfirm.account_id
-        );
-        return response
-          .json("")
-          .redirect(Env.get("VUE_APP_FONTEND_URL") + "/login");
+          const accountRegisterSuccessfully = await Account.find(
+            accountConfirm.account_id
+          );
+          return response.json({
+            message: "Registration confirmation successful",
+          });
+        } else {
+          return response.status(304).json({
+            message: "This token is not available",
+          });
+        }
+      } else {
+        return response.status(500).json({
+          message: "Token not exist",
+        });
       }
-    } else {
-      return response.json({
-        message: "token not exist",
-      });
+    } catch (error) {
+      return response.status(500).send(error);
     }
   }
 }
