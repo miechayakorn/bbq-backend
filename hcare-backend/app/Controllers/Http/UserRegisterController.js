@@ -41,7 +41,7 @@ class UserRegisterController {
           tokenHash,
           url: Env.get("VUE_APP_FONTEND_URL"),
         };
-
+        console.log("+++++++++++++++++++++++++++++++++++");
         console.log(dataForSendEmail);
 
         const sendMail = await Mail.send(
@@ -79,18 +79,20 @@ class UserRegisterController {
   async confirmRegister({ request, response }) {
     const query = request.get();
     try {
+      console.log("token");
+      console.log(query.token);
       if (query.token) {
         const accountConfirm = await Token.findBy("token", query.token);
         console.log(accountConfirm);
-
         if (accountConfirm) {
+          console.log("111111111111111111111111111111111111111111");
           await Account.query()
             .where("account_id", accountConfirm.account_id)
             .update({ verify: true });
 
-          const accountRegisterSuccessfully = await Account.find(
-            accountConfirm.account_id
-          );
+          // const accountRegisterSuccessfully = await Account.find(
+          //   accountConfirm.account_id
+          // );
           return response.json({
             message: "Registration confirmation successful",
           });

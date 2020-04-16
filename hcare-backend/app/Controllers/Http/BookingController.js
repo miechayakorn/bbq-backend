@@ -42,7 +42,7 @@ class BookingController {
       const allBooking2 = await Database.table("bookings")
         .select("date")
         .distinct("date")
-        .select(Database.raw('DATE_FORMAT(date, "%W %d-%m-%Y") as dateformat'))
+        .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as dateformat'))
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .where({ type_id: params.type_id });
 
@@ -103,7 +103,7 @@ class BookingController {
         "date",
         "status"
       )
-        .select(Database.raw('DATE_FORMAT(date, "%W %d-%m-%Y") as date'))
+        .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as date'))
         .from("bookings")
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
@@ -225,7 +225,7 @@ class BookingController {
         "link_meeting",
         "comment_from_staff"
       )
-        .select(Database.raw('DATE_FORMAT(date, "%d/%m/%Y") as date'))
+        .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as date'))
         .from("bookings")
         .innerJoin(
           "accounts",
@@ -296,9 +296,10 @@ class BookingController {
         "work_times.type_id",
         "type_name",
         "date",
-        "time_in"
+        "time_in",
+        "link_meeting"
       )
-        .select(Database.raw('DATE_FORMAT(date, "%W %d-%m-%Y") as date'))
+        .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as dateformat'))
         .from("bookings")
         .innerJoin(
           "accounts",
@@ -310,7 +311,9 @@ class BookingController {
         .where({
           account_id_from_user: dataMyAppoint.account_id,
           status: "confirm successful",
-        });
+        })
+        .orderBy("date", "time");
+
       console.log(mybooking);
 
       if (!mybooking[0]) {
@@ -353,7 +356,7 @@ class BookingController {
         "time_in",
         "link_meeting"
       )
-        .select(Database.raw('DATE_FORMAT(date, "%W %d-%m-%Y") as date'))
+        .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as dateformat'))
         .from("bookings")
         .innerJoin(
           "accounts",
