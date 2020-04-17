@@ -92,7 +92,7 @@ class BookingController {
         .where("account_id", dataFromBooking.account_id)
         .first();
 
-      console.log("************************");
+      console.log("********************************************************");
 
       // find booking slot from bookingID that get from request to find in DB
       const findBooking = await Database.select(
@@ -177,7 +177,9 @@ class BookingController {
           query.token
         );
 
-        console.log("---------------------------------------------");
+        console.log(
+          "check booking from email ---------------------------------------------"
+        );
         console.log(booking);
 
         if (booking) {
@@ -418,29 +420,38 @@ class BookingController {
   async cancelAppointment({ request, response }) {
     try {
       const dataCancel = await request.only(["booking_id"]);
-      console.log(dataCancel);
-      const booking = await Booking.find(dataCancel.booking_id);
-      if (booking) {
-        await Booking.query()
-          .where("booking_id", dataCancel.booking_id)
-          .update({
-            status: null,
-            comment_from_user: null,
-            comment_from_staff: null,
-            token_booking_confirm: null,
-            link_meeting: null,
-            account_id_from_user: null,
+      console.log(dataCancel.booking_id);
+      if (dataCancel.booking_id) {
+        const booking = await Booking.find(dataCancel.booking_id);
+        console.log(booking.status);
+        if (booking.status != null) {
+          await Booking.query()
+            .where("booking_id", dataCancel.booking_id)
+            .update({
+              status: null,
+              comment_from_user: null,
+              comment_from_staff: null,
+              token_booking_confirm: null,
+              link_meeting: null,
+              account_id_from_user: null,
+            });
+          const bookingUpdate = await Database.from("bookings").where(
+            "booking_id",
+            booking.booking_id
+          );
+          return response.json({
+            message: "clear schedule successful",
+            booking: bookingUpdate,
           });
-        const bookingUpdate = await Database.from("bookings").where(
-          "booking_id",
-          booking.booking_id
-        );
-        return response.json({
-          message: "clear schedule successful",
-          booking: bookingUpdate,
-        });
+        } else {
+          return response
+            .status(304)
+            .json({ message: "Don't have booking in database" });
+        }
       } else {
-        return "Have no booking in database";
+        return response
+          .status(500)
+          .json({ message: "Booking ID does not exist" });
       }
     } catch (error) {
       response.status(500).send(error);
