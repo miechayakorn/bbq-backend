@@ -434,6 +434,7 @@ class BookingController {
               token_booking_confirm: null,
               link_meeting: null,
               account_id_from_user: null,
+              account_id_from_staff: null,
             });
           const bookingUpdate = await Database.from("bookings").where(
             "booking_id",
@@ -472,6 +473,10 @@ class BookingController {
         "symptom",
         "accountid_doctor",
       ]);
+      console.log(booking_id);
+      console.log(hn_number);
+      console.log(symptom);
+      console.log(accountid_doctor);
 
       //find account from hn_number
       const userAccount = await Database.select(
@@ -484,6 +489,7 @@ class BookingController {
         .where("hn_number", hn_number)
         .first();
 
+      console.log(userAccount);
       console.log(
         "************************submitBookingFromHealthcare********************************"
       );
@@ -511,13 +517,6 @@ class BookingController {
 
         if (!findBooking.status) {
           // check booking status available
-
-          const tokenNoHash = `${Date.now()}${
-            findBooking.booking_id
-          }${Date.now()}`;
-          const token = await Hash.make(tokenNoHash);
-
-          console.log(token);
 
           const dataForSendEmail = {
             account: userAccount,
