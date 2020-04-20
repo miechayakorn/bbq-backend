@@ -458,6 +458,104 @@ class BookingController {
     }
   }
 
+  //จองตารางนัดหมายโดย Healthcare
+  async submitBookingFromHealthcare({ request, response }) {
+    try {
+      const {
+        booking_id,
+        hn_number,
+        symptom,
+        accountid_doctor,
+      } = request.only([
+        "booking_id",
+        "hn_number",
+        "symptom",
+        "accountid_doctor",
+      ]);
+
+      //find account from hn_number
+      const userAccount = await Database.select(
+        "account_id",
+        "email",
+        "first_name",
+        "last_name"
+      )
+        .from("accounts")
+        .where("hn_number", hn_number)
+        .first();
+
+      console.log(
+        "************************submitBookingFromHealthcare********************************"
+      );
+
+      // find booking slot from bookingID that get from request to find in DB
+      const findBooking = await Database.select(
+        "booking_id",
+        "type_name",
+        "time_in",
+        "time_out",
+        "date",
+        "status"
+      )
+        .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as date'))
+        .from("bookings")
+        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
+        .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
+        .where("bookings.booking_id", booking_id)
+        .first();
+
+      console.log(findBooking);
+
+      if (userAccount) {
+        // check account not null
+
+        if (!findBooking.status) {
+          // check booking status available
+
+          const tokenNoHash = `${Date.now()}${
+            findBooking.booking_id
+          }${Date.now()}`;
+          const token = await Hash.make(tokenNoHash);
+
+          console.log(token);
+
+          const dataForSendEmail = {
+            account: userAccount,
+            bookingSlot: findBooking,
+            url: Env.get("VUE_APP_FONTEND_URL"),
+          };
+
+          console.log(dataForSendEmail);
+
+          const subject =
+            "Boooking By Health Care  " +
+            dataForSendEmail.bookingSlot.type_name.toString();
+
+          await Mail.send("sendmailbooking", dataForSendEmail, (message) => {
+            message
+              .to(userAccount.email)
+              .from("Mail from healthcare")
+              .subject(subject);
+          });
+
+          await Database.table("bookings")
+            .where("booking_id", booking_id)
+            .update({
+              account_id_from_user: dataForSendEmail.account.account_id,
+              status: "confirm successful",
+              comment_from_user: symptom,
+              account_id_from_staff: accountid_doctor,
+            });
+
+          return "send mail success";
+        }
+        return response.status(400).send("This booking unavailable");
+      }
+    } catch (error) {
+      return response.status(500).send(error);
+    }
+  }
+
   //ยังไม่ได้ใช้งาน
   /*async showBookingForHCAREDefault({ request, response }) {
     try {
