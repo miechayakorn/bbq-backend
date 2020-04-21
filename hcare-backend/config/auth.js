@@ -32,7 +32,7 @@ module.exports = {
     model: "App/Models/User",
     scheme: "session",
     uid: "email",
-    password: "password"
+    password: "password",
   },
 
   /*
@@ -53,7 +53,7 @@ module.exports = {
     model: "App/Models/User",
     scheme: "basic",
     uid: "email",
-    password: "password"
+    password: "password",
   },
 
   /*
@@ -69,12 +69,12 @@ module.exports = {
     serializer: "lucid",
     model: "App/Models/Account",
     scheme: "jwt",
-    uid: "email",
-    password: "password",
+    uid: "email", //user
+    password: "password", //password
     options: {
       secret: Env.get("APP_KEY"),
-      expiresIn: Env.get("JWT_EXPIRE", 604800) // 7 days
-    }
+      expiresIn: Env.get("JWT_EXPIRE", 604800), // 7 days
+    },
   },
 
   /*
@@ -90,6 +90,6 @@ module.exports = {
     model: "App/Models/User",
     scheme: "api",
     uid: "email",
-    password: "password"
-  }
+    password: "password",
+  },
 };

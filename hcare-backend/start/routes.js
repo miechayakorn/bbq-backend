@@ -23,11 +23,12 @@ Route.on("/").render("welcome");
 Route.post("/register", "UserRegisterController.createUser");
 Route.get("/register/confirm", "UserRegisterController.confirmRegister");
 Route.post("/login", "AuthController.authenticate");
+Route.post("/login/confirm", "AuthController.confirmauthenticate");
 
 //staff register
 Route.post("/staffRegister", "StaffRegisterController.createStaff");
 
-//staff modify 
+//staff modify
 Route.post("createtype", "CreateTypeController.create");
 Route.post("updatetype", "CreateTypeController.update");
 Route.post("createbooking", "CreateBookingController.create");
@@ -41,7 +42,10 @@ Route.get("/bookings/confirm", "BookingController.confirmBooking");
 
 //show booking for individual user
 Route.post("/myappointment", "BookingController.myAppointment");
-Route.get("/appointment/detail/:booking_id","BookingController.myAppointmentDetail");
+Route.get(
+  "/appointment/detail/:booking_id",
+  "BookingController.myAppointmentDetail"
+);
 
 //Dashboard
 Route.get("/showbooking", "BookingController.showBookingForHCAREDefault");
@@ -49,5 +53,11 @@ Route.get("/showbooking/:type/:date", "BookingController.showBookingForHCARE");
 Route.get("/patientbooking/:booking_id", "BookingController.patientBooking");
 Route.post("/patientbooking/edit", "BookingController.editPatientBooking");
 Route.post("/cancel", "BookingController.cancelAppointment");
-Route.get("/patientbooking/detail/:booking_id", "BookingController.patientDetail");
-Route.post("/booking/healthcare", "BookingController.submitBookingFromHealthcare");
+Route.get(
+  "/patientbooking/detail/:booking_id",
+  "BookingController.patientDetail"
+);
+Route.post(
+  "/booking/healthcare",
+  "BookingController.submitBookingFromHealthcare"
+);
