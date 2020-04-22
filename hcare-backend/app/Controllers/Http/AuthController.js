@@ -20,7 +20,13 @@ class AuthController {
       console.log(account);
 
       if (account) {
-        const otp = `${Date.now()}${account.hn_number}`;
+        // const otp = `${Date.now()}${account.hn_number}`;
+        // console.log(otp);
+        let digits = "0123456789";
+        const otp = "";
+        for (let i = 0; i < 6; i++) {
+          otp += digits[Math.floor(Math.random() * 10)];
+        }
         console.log(otp);
 
         const dataSendEmail = {
@@ -65,13 +71,10 @@ class AuthController {
   }
 
   async confirmauthenticate({ request, response, auth }) {
-    const data = request.only(["email", "otp"]);
-    const password = data.otp;
-    console.log(data.email);
-    console.log(password);
+    const data = request.only(["email", "password"]);
 
     try {
-      if (await auth.attempt(data.email, password)) {
+      if (await auth.attempt(data.email, data.password)) {
         let account = await Account.findBy("email", data.email);
         let token = await auth.generate(account);
 
@@ -92,6 +95,7 @@ class AuthController {
           refreshToken: token.refreshToken,
         };
 
+        
         return response.json(dataResp);
       }
     } catch (error) {
