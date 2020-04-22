@@ -22,10 +22,10 @@ class AuthController {
       if (account) {
         // const otp = `${Date.now()}${account.hn_number}`;
         // console.log(otp);
-        let digits = "0123456789";
-        const otp = "";
+        const digits = "0123456789";
+        var otp = "";
         for (let i = 0; i < 6; i++) {
-          otp += digits[Math.floor(Math.random() * 10)];
+          otp = otp + digits[Math.floor(Math.random() * 10)];
         }
         console.log(otp);
 
@@ -95,7 +95,6 @@ class AuthController {
           refreshToken: token.refreshToken,
         };
 
-        
         return response.json(dataResp);
       }
     } catch (error) {
