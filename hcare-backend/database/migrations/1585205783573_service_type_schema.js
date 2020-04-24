@@ -1,21 +1,23 @@
-'use strict'
+"use strict";
 
 /** @type {import('@adonisjs/lucid/src/Schema')} */
-const Schema = use('Schema')
+const Schema = use("Schema");
 
 class ServiceTypeSchema extends Schema {
-  up () {
-    this.create('servicetypes', (table) => {
-      table.increments('type_id').primary() //PK
-      table.string('type_name').notNullable()
-      table.boolean('available').defaultTo(true)   
-      table.timestamps()
-    })
+  up() {
+    this.create("servicetypes", (table) => {
+      table.increments("type_id").primary(); //PK
+      table.string("type_name").notNullable();
+      table
+        .enum("availability", ["AVAILABLE", "UNAVAILABLE"])
+        .defaultTo("AVAILABLE");
+      table.timestamps();
+    });
   }
 
-  down () {
-    this.drop('servicetypes')
+  down() {
+    this.drop("servicetypes");
   }
 }
 
-module.exports = ServiceTypeSchema
+module.exports = ServiceTypeSchema;

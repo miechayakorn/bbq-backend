@@ -5,19 +5,16 @@ const Schema = use("Schema");
 
 class AccountSchema extends Schema {
   up() {
-    this.create("accounts", table => {
+    this.create("accounts", (table) => {
       table.increments("account_id").primary(); //  [PK]
-      table
-        .bigInteger("hn_number")
-        .notNullable()
-        .unique(); // [UQ,NN]
+      table.bigInteger("hn_number").notNullable().unique(); // [UQ,NN]
       table.string("password").notNullable();
       table.string("first_name").notNullable();
       table.string("last_name").notNullable();
-      table.boolean("verify").defaultTo(false); //[T,F]
-      table.string("gender", 10).nullable();
+      table.enum("verify", ["SUCCESS", "NOT VERIFY"]).defaultTo("NOT VERIFY"); //[T,F]
+      table.enum("gender", ["MALE", "FEMALE"]).nullable();
       table.string("date_of_birth", 20).nullable();
-      table.string("email", 254).notNullable(); // [NN,CK]
+      table.string("email").notNullable().unique(); // [NN,UQ]
       table.bigInteger("telephone").notNullable(); // [NN]
       table.string("role").notNullable(); // [NN]
 
