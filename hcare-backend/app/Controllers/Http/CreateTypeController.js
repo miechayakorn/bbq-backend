@@ -7,18 +7,11 @@ class CreateTypeController {
     try {
       let data = await request.only(["type_name"]);
       console.log(data);
-      const typeCreate = await Database.insert({
-        type_name: data.type_name
-      }).into("servicetypes");
-      // const typeCreate = await ServiceType.create({
-      //   type_name: data.type_name
-      // });
+      const typeCreate = await ServiceType.create({
+        type_name: data.type_name,
+      });
       console.log(await Database.from("servicetypes"));
-
-      return await Database.from("servicetypes").where(
-        "type_id",
-        typeCreate[0]
-      );
+      return typeCreate;
     } catch (error) {
       return response.status(error.status).send(error);
     }

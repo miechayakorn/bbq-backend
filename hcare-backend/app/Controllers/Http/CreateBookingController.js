@@ -1,43 +1,38 @@
 "use strict";
-const Type = use("App/Models/Type");
 const Database = use("Database");
 
 class CreateBookingController {
-  async create({ request, response }) {
+  async checkWorktime({ request, response }) {
+    const { type_id, day } = request.only(["type_id", "day"]);
     try {
-      const data = await request.only(["type_id"]);
-      //console.log(data);
-    //   let start_time = await Database.select("start_time")
-    //     .from("types")
-    //     .where({
-    //       type_id: data.type_id
-    //     });
-    //   let end_time = await Database.select("end_time")
-    //     .from("types")
-    //     .where({
-    //       type_id: data.type_id
-    //     });
-
-    //   start_time = start_time[0].start_time;
-    //   end_time = end_time[0].end_time;
-    //   let hours_start = parseInt(start_time.substring(0,2));
-    //   let min_start = parseInt(start_time.substring(3,6));
-
-    //   let hours_end = parseInt(end_time.substring(0,2));
-    //   let min_end = parseInt(end_time.substring(3,5));
-
-    //   const timeForSlot =  ((hours_end-hours_start)*60);
-      
-    //   console.log(min_start);
-    //     const typeFromDB = await Type.find(params.type)
-    //     console.log(typeFromDB)
-
-      const type = Database.from('types').where({type_id:data.type_id})
-      return type; 
-
+      day = day.toUpperCase();
+      console.log(day);
+      const workTime = await Database.select("*")
+        .from("work_times")
+        .where({ type_id: type_id, day: day });
+      if (workTime) {
+        return response.json(workTime);
+      } else {
+        return response.status(204);
+      }
     } catch (error) {
-      return response.status(error.status).send(error);
+      response.status(500).send(error);
     }
+  }
+  async store({ request, response }) {
+    // const { date, working_id, time_slot } = await request.only([
+    //   "date",
+    //   "working_id",
+    //   "time_slot",
+    // ]);
+    // try {
+    //   if (date && working_id && time_slot) {
+    //     for (let index = 0; index < time_slot.length; index++) {
+    //       await Database.insert({})
+    //     }
+    //   }
+    // } catch (error) {
+    // }
   }
 }
 
