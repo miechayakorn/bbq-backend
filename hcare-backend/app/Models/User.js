@@ -4,15 +4,6 @@
 const Model = use("Model");
 
 class User extends Model {
-  // static get primaryKey() {
-  //   return "user_id";
-  // }
-  // tokens() {
-  //   return this.hasMany("App/Models/Token");
-  // }
-  // accounts() {
-  //   return this.belongsTo("App/Models/Account");
-  // }
 }
 
 module.exports = User;

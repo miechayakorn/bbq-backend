@@ -7,6 +7,9 @@ class ServiceType extends Model {
   static get primaryKey() {
     return "type_id";
   }
+  static get table() {
+    return "servicetypes";
+  }
 }
 
 module.exports = ServiceType;

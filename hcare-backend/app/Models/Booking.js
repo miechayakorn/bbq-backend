@@ -8,13 +8,9 @@ class Booking extends Model {
   static get primaryKey() {
     return "booking_id";
   }
-  static get dates() {
-    return super.dates.concat(["date"]);
-  }
-
   static formatDates(field, value) {
     if (field === "date") {
-      return value.format("DD-MM-YYYY");
+      return value.format("YYYY-MM-DD");
     }
     return super.formatDates(field, value);
   }
