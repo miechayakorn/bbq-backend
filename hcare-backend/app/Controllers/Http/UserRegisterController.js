@@ -5,6 +5,8 @@ const Token = use("App/Models/Token");
 const Mail = use("Mail");
 const Hash = use("Hash");
 const Env = use("Env");
+const RegisterRules = use("App/Validators/Register");
+const { validateAll } = use("Validator");
 
 class UserRegisterController {
   // create user and sendmail to confirm
@@ -19,7 +21,8 @@ class UserRegisterController {
         "last_name",
       ]);
 
-      console.log(data);
+      await validateAll(data, RegisterRules);
+
 
       const accountUser = await Account.create({
         password: data.password,
@@ -31,6 +34,7 @@ class UserRegisterController {
         telephone: data.telephone,
       });
 
+
       if (accountUser) {
         const token = `${Date.now()}${accountUser.$attributes.hn_number}`;
         const tokenHash = await Hash.make(token);
@@ -41,7 +45,6 @@ class UserRegisterController {
           tokenHash,
           url: Env.get("VUE_APP_FONTEND_URL"),
         };
-        console.log("+++++++++++++++++++++++++++++++++++");
         console.log(dataForSendEmail);
 
         const sendMail = await Mail.send(
@@ -85,14 +88,9 @@ class UserRegisterController {
         const accountConfirm = await Token.findBy("token", query.token);
         console.log(accountConfirm);
         if (accountConfirm) {
-          console.log("111111111111111111111111111111111111111111");
           await Account.query()
             .where("account_id", accountConfirm.account_id)
             .update({ verify: true });
-
-          // const accountRegisterSuccessfully = await Account.find(
-          //   accountConfirm.account_id
-          // );
           return response.json({
             message: "Registration confirmation successful",
           });
