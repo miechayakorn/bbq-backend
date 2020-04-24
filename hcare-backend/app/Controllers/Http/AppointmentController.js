@@ -9,97 +9,130 @@ const Env = use("Env");
 
 class AppointmentController {
   /*show appointment for patient*/
-  async myAppointment({ request, response }) {
+  async myAppointment({ request, response, auth }) {
     try {
-      const dataMyAppoint = request.only(["account_id"]);
-      console.log(dataMyAppoint);
-      const mybooking = await Database.select(
-        "account_id",
-        "hn_number",
-        "first_name",
-        "last_name",
-        "booking_id",
-        "work_times.type_id",
-        "type_name",
-        "date",
-        "time_in",
-        "link_meeting"
-      )
-        .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as dateformat'))
-        .from("bookings")
-        .innerJoin(
-          "accounts",
-          "bookings.account_id_from_user",
-          "accounts.account_id"
+      const account = await auth.getUser();
+      if (account) {
+        const mybooking = await Database.select(
+          "account_id",
+          "hn_number",
+          "first_name",
+          "last_name",
+          "booking_id",
+          "work_times.type_id",
+          "type_name",
+          "date",
+          "time_in",
+          "link_meeting"
         )
-        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
-        .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
-        .where({
-          account_id_from_user: dataMyAppoint.account_id,
-          status: "confirm successful",
-        })
-        .orderBy("date", "time");
+          .select(
+            Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as dateformat')
+          )
+          .from("bookings")
+          .innerJoin(
+            "accounts",
+            "bookings.account_id_from_user",
+            "accounts.account_id"
+          )
+          .innerJoin(
+            "work_times",
+            "bookings.working_id",
+            "work_times.working_id"
+          )
+          .innerJoin(
+            "servicetypes",
+            "work_times.type_id",
+            "servicetypes.type_id"
+          )
+          .where({
+            account_id_from_user: account.account_id,
+            status: "confirm successful",
+          })
+          .orderBy("date", "time");
 
-      console.log(mybooking);
+        console.log(mybooking);
 
-      if (!mybooking[0]) {
-        response.status(204).send();
+        if (!mybooking[0]) {
+          response.status(204).send();
+        }
+
+        return mybooking;
+      } else {
+        response.status(401).send();
       }
-
-      return mybooking;
     } catch (error) {
       response.status(500).send(error);
     }
   }
 
   //หน้า appointment detail เมื่อคลิกที่ card
-  async myAppointmentDetail({ request, response, params }) {
+  async myAppointmentDetail({ request, response, params, auth }) {
     try {
-      console.log(params.booking_id);
+      const account = await auth.getUser();
 
-      //find doctor in account table
-      const doctor = await Database.select(
-        "account_id AS doctor_id",
-        "first_name AS doctor_firstname",
-        "last_name AS doctor_lastname"
-      )
-        .from("bookings")
-        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
-        .innerJoin("accounts", "work_times.doctor_id", "accounts.account_id")
-        .where({ booking_id: params.booking_id, role: "doctor" })
-        .first();
+      if (account) {
+        console.log(params.booking_id);
 
-      // find booking and personal data of patient
-      const booking = await Database.select(
-        "account_id",
-        "hn_number",
-        "first_name",
-        "last_name",
-        "booking_id",
-        "work_times.type_id",
-        "type_name",
-        "date",
-        "time_in",
-        "link_meeting"
-      )
-        .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as dateformat'))
-        .from("bookings")
-        .innerJoin(
-          "accounts",
-          "bookings.account_id_from_user",
-          "accounts.account_id"
+        //find doctor in account table
+        const doctor = await Database.select(
+          "account_id AS doctor_id",
+          "first_name AS doctor_firstname",
+          "last_name AS doctor_lastname"
         )
-        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
-        .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
-        .where({
-          booking_id: params.booking_id,
-          status: "confirm successful",
-        })
-        .first();
+          .from("bookings")
+          .innerJoin(
+            "work_times",
+            "bookings.working_id",
+            "work_times.working_id"
+          )
+          .innerJoin("accounts", "work_times.doctor_id", "accounts.account_id")
+          .where({ booking_id: params.booking_id, role: "doctor" })
+          .first();
 
-      const sendBooking = { ...booking, ...doctor };
+        // find booking and personal data of patient
+        const booking = await Database.select(
+          "account_id",
+          "hn_number",
+          "first_name",
+          "last_name",
+          "booking_id",
+          "work_times.type_id",
+          "type_name",
+          "date",
+          "time_in",
+          "link_meeting"
+        )
+          .select(
+            Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as dateformat')
+          )
+          .from("bookings")
+          .innerJoin(
+            "accounts",
+            "bookings.account_id_from_user",
+            "accounts.account_id"
+          )
+          .innerJoin(
+            "work_times",
+            "bookings.working_id",
+            "work_times.working_id"
+          )
+          .innerJoin(
+            "servicetypes",
+            "work_times.type_id",
+            "servicetypes.type_id"
+          )
+          .where({
+            booking_id: params.booking_id,
+            status: "confirm successful",
+          })
+          .first();
 
-      console.log(sendBooking);
+        const sendBooking = { ...booking, ...doctor };
+
+        console.log(sendBooking);
+      } else {
+        return response.status(401).send();
+      }
 
       return sendBooking;
     } catch (error) {

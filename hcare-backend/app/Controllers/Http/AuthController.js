@@ -20,8 +20,6 @@ class AuthController {
       console.log(account);
 
       if (account) {
-        // const otp = `${Date.now()}${account.hn_number}`;
-        // console.log(otp);
         const digits = "0123456789";
         var otp = "";
         for (let i = 0; i < 6; i++) {
@@ -79,18 +77,18 @@ class AuthController {
         let token = await auth.generate(account);
 
         let dataResp = {
-          account_id: account.account_id,
-          hn_number: account.hn_number,
+          // account_id: account.account_id,
+          // hn_number: account.hn_number,
+
+          // verify: account.verify,
+          // gender: account.gender,
+          // date_of_birth: account.date_of_birth,
+          // email: account.email,
+          // telephone: account.telephone,
+          // role: account.role,
+          // type: token.type,
           first_name: account.first_name,
           last_name: account.last_name,
-          verify: account.verify,
-          gender: account.gender,
-          date_of_birth: account.date_of_birth,
-          email: account.email,
-          telephone: account.telephone,
-          role: account.role,
-
-          type: token.type,
           token: token.token,
           refreshToken: token.refreshToken,
         };
@@ -102,6 +100,13 @@ class AuthController {
       return response
         .status(401)
         .json({ message: "You are not registered!", error });
+    }
+  }
+  async myprofile({ request, response, auth }) {
+    try {
+      return response.json({ user: await auth.getUser() });
+    } catch (error) {
+      console.log(error);
     }
   }
 }

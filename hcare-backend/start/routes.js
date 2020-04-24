@@ -14,50 +14,61 @@
 */
 
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
+
 const Route = use("Route");
 const Database = use("Database");
 
 Route.on("/").render("welcome");
 
 //user register & login
-Route.post("/register", "UserRegisterController.createUser");
-Route.get("/register/confirm", "UserRegisterController.confirmRegister");
-Route.post("/login", "AuthController.authenticate");
-Route.post("/login/confirm", "AuthController.confirmauthenticate");
+
+Route.group(() => {
+  Route.post("/register", "UserRegisterController.createUser");
+  Route.get("/register/confirm", "UserRegisterController.confirmRegister");
+  Route.post("/login", "AuthController.authenticate");
+  Route.post("/login/confirm", "AuthController.confirmauthenticate");
+}).middleware("guest");
+Route.get("/user/me", "AuthController.myprofile").middleware("auth"); //test token
 
 //staff register
-Route.post("/staffRegister", "StaffRegisterController.createStaff");
+// Route.post("/staffRegister", "StaffRegisterController.createStaff");
 
 //staff modify
 Route.post("createtype", "CreateTypeController.create");
 Route.post("updatetype", "CreateTypeController.update");
-Route.post("createbooking", "CreateBookingController.create");
+Route.post("createbooking/check", "CreateBookingController.checkWorktime");
+Route.post("createbooking", "CreateBookingController.store");
 
 //for booking feature
 Route.get("/ServiceTypes", "BookingController.showType");
 Route.get("/ServiceDate/:type_id", "BookingController.showDate");
 Route.get("/ServiceTime/:type_id", "BookingController.showTime");
-Route.post("/Booking", "BookingController.submitBooking");
+Route.group(() => {
+  Route.post("/Booking", "BookingController.submitBooking");
+}).middleware("auth");
 Route.get("/bookings/confirm", "BookingController.confirmBooking");
 
 //show booking for individual user
-Route.post("/myappointment", "BookingController.myAppointment");
-Route.get(
-  "/appointment/detail/:booking_id",
-  "BookingController.myAppointmentDetail"
-);
+Route.group(() => {
+  Route.post("/myappointment", "AppointmentController.myAppointment");
+  Route.get(
+    "/appointment/detail/:booking_id",
+    "AppointmentController.myAppointmentDetail"
+  );
+}).middleware("auth");
 
-//Dashboard
-Route.get("/showbooking", "BookingController.showBookingForHCAREDefault");
-Route.get("/showbooking/:type/:date", "BookingController.showBookingForHCARE");
-Route.get("/patientbooking/:booking_id", "BookingController.patientBooking");
-Route.post("/patientbooking/edit", "BookingController.editPatientBooking");
-Route.post("/cancel", "BookingController.cancelAppointment");
+//Dashboard Booking
 Route.get(
-  "/patientbooking/detail/:booking_id",
-  "BookingController.patientDetail"
+  "/showbooking/:type/:date",
+  "DashboardBookingController.showBookingForHCARE"
 );
 Route.post(
-  "/booking/healthcare",
-  "BookingController.submitBookingFromHealthcare"
+  "/patientbooking/edit",
+  "DashboardBookingController.editPatientBooking"
 );
+Route.post("/cancel", "DashboardBookingController.cancelAppointment"); // ผู้ป่วยยกเลิกก็ใช้ controller นี้
+Route.post(
+  "/booking/healthcare",
+  "DashboardBookingController.submitBookingFromHealthcare"
+);
+//Route.get("/patientbooking/detail/:booking_id", "BookingController.patientDetail");
