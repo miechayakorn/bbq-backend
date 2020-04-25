@@ -46,7 +46,7 @@ class AppointmentController {
           )
           .where({
             account_id_from_user: account.account_id,
-            status: "confirm successful",
+            status: "CONFIRM SUCCESS",
           })
           .orderBy("date", "time");
 
@@ -71,8 +71,6 @@ class AppointmentController {
       const account = await auth.getUser();
 
       if (account) {
-        console.log(params.booking_id);
-
         //find doctor in account table
         const doctor = await Database.select(
           "account_id AS doctor_id",
@@ -123,18 +121,64 @@ class AppointmentController {
           )
           .where({
             booking_id: params.booking_id,
-            status: "confirm successful",
+            status: "CONFIRM SUCCESS",
           })
           .first();
 
         const sendBooking = { ...booking, ...doctor };
 
         console.log(sendBooking);
+
+        return sendBooking;
       } else {
         return response.status(401).send();
       }
 
       return sendBooking;
+    } catch (error) {
+      response.status(500).send(error);
+    }
+  }
+
+  async cancelAppointmentFromAppointmentDetail({ request, response, auth }) {
+    try {
+      const { booking_id } = await request.only(["booking_id"]);
+      if (booking_id) {
+        const booking = await Booking.find(booking_id);
+        const account = await auth.getUser();
+
+        if (booking.status == "confirm successful") {
+          await Booking.query()
+            .where({
+              booking_id: booking_id,
+              account_id_from_user: account.account_id,
+            })
+            .update({
+              status: null,
+              comment_from_user: null,
+              comment_from_staff: null,
+              token_booking_confirm: null,
+              link_meeting: null,
+              account_id_from_user: null,
+              account_id_from_staff: null,
+            });
+
+          const bookingUpdate = await Booking.find(booking_id);
+
+          return response.json({
+            message: "clear schedule successful",
+            booking: bookingUpdate,
+          });
+        } else {
+          return response
+            .status(304)
+            .json({ message: "Don't have booking in database" });
+        }
+      } else {
+        return response
+          .status(500)
+          .json({ message: "Booking ID does not exist" });
+      }
     } catch (error) {
       response.status(500).send(error);
     }
