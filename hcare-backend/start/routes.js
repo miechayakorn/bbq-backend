@@ -21,10 +21,9 @@ const Database = use("Database");
 Route.on("/").render("welcome");
 
 //user register & login
-
+Route.post("/register", "UserRegisterController.createUser");
+Route.get("/register/confirm", "UserRegisterController.confirmRegister");
 Route.group(() => {
-  Route.post("/register", "UserRegisterController.createUser");
-  Route.get("/register/confirm", "UserRegisterController.confirmRegister");
   Route.post("/login", "AuthController.authenticate");
   Route.post("/login/confirm", "AuthController.confirmauthenticate");
 }).middleware("guest");
@@ -50,10 +49,14 @@ Route.get("/bookings/confirm", "BookingController.confirmBooking");
 
 //show booking for individual user
 Route.group(() => {
-  Route.post("/myappointment", "AppointmentController.myAppointment");
+  Route.get("/myappointment", "AppointmentController.myAppointment");
   Route.get(
     "/appointment/detail/:booking_id",
     "AppointmentController.myAppointmentDetail"
+  );
+  Route.post(
+    "/appointment/cancel",
+    "AppointmentController.cancelAppointmentFromAppointmentDetail"
   );
 }).middleware("auth");
 
