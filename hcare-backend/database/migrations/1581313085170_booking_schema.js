@@ -10,10 +10,10 @@ class BookingSchema extends Schema {
       table.time("time_in");
       table.time("time_out");
       table.date("date");
-      table.ENUM("status", ["WAITTING CONFIRM", "CONFIRM SUCCESS"]).nullable(); // 3 status (null , waitting confirm , confirm successful)
+      table.enum("status", ["WAITTING CONFIRM", "CONFIRM SUCCESS"]).nullable(); // 3 status (null , waitting confirm , confirm successful)
       table.text("comment_from_user");
       table.text("comment_from_staff");
-      table.ENUM("check_attention", ["PRESENT", "ABSENT"]).defaultTo("ABSENT");
+      table.enum("check_attention", ["PRESENT", "ABSENT"]).defaultTo("ABSENT");
       table.string("token_booking_confirm").nullable();
       table.index("token_booking_confirm", "token_booking_confirm"); //INDEX
       table
