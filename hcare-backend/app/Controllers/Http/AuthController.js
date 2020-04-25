@@ -77,18 +77,9 @@ class AuthController {
         let token = await auth.generate(account);
 
         let dataResp = {
-          // account_id: account.account_id,
-          // hn_number: account.hn_number,
-
-          // verify: account.verify,
-          // gender: account.gender,
-          // date_of_birth: account.date_of_birth,
-          // email: account.email,
-          // telephone: account.telephone,
-          // role: account.role,
-          // type: token.type,
           first_name: account.first_name,
           last_name: account.last_name,
+          type: token.type,
           token: token.token,
           refreshToken: token.refreshToken,
         };

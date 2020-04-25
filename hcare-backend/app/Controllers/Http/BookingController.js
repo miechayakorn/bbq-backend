@@ -11,7 +11,10 @@ class BookingController {
   //แสดงประเภทการนัดหมาย
   async showType({ request, response }) {
     try {
-      let types = await Database.from("servicetypes");
+      let types = await Database.from("servicetypes").where(
+        "availability",
+        "AVAILABLE"
+      );
       const returnType = []; // return to fontend type_id and type_name only
       for (let index = 0; index < types.length; index++) {
         returnType[index] = {
@@ -70,10 +73,8 @@ class BookingController {
   //จองตารางนัดหมาย และส่ง e-mail
   async submitBooking({ request, response, auth }) {
     try {
-      const dataFromBooking = request.only([
-        "booking_id",
-        "symptom",
-      ]);
+      const dataFromBooking = request.only(["booking_id", "symptom"]);
+
       console.log(dataFromBooking);
 
       const account = await auth.getUser();
@@ -127,19 +128,11 @@ class BookingController {
               .subject(subject);
           });
 
-          // await Database.table("bookings")
-          //   .where("booking_id", dataFromBooking.booking_id)
-          //   .update({
-          //     account_id_from_user: dataForSendEmail.account.account_id,
-          //     status: "waitting confirm",
-          //     comment_from_user: dataFromBooking.symptom,
-          //     token_booking_confirm: token,
-          //   });
           await Booking.query()
             .where("booking_id", dataFromBooking.booking_id)
             .update({
               account_id_from_user: dataForSendEmail.account.account_id,
-              status: "waitting confirm",
+              status: "WAITTING CONFIRM",
               comment_from_user: dataFromBooking.symptom,
               token_booking_confirm: token,
             });
@@ -164,7 +157,7 @@ class BookingController {
 
         if (booking) {
           await Booking.query().where("booking_id", booking.booking_id).update({
-            status: "confirm successful",
+            status: "CONFIRM SUCCESS",
             token_booking_confirm: null,
           });
 

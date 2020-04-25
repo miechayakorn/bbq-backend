@@ -23,17 +23,16 @@ class UserRegisterController {
 
       await validateAll(data, RegisterRules);
 
-
       const accountUser = await Account.create({
         password: data.password,
         hn_number: data.hn_number,
         first_name: data.first_name,
         last_name: data.last_name,
-        role: "user",
+        role: "USER",
         email: data.email,
         telephone: data.telephone,
+        verify: "NOT VERIFY",
       });
-
 
       if (accountUser) {
         const token = `${Date.now()}${accountUser.$attributes.hn_number}`;
@@ -63,7 +62,7 @@ class UserRegisterController {
           const createTokenDB = await Token.create({
             account_id: dataForSendEmail.account.account_id,
             token: tokenHash,
-            type: "Register",
+            type: "REGISTER",
           });
 
           console.log(createTokenDB);
@@ -90,7 +89,7 @@ class UserRegisterController {
         if (accountConfirm) {
           await Account.query()
             .where("account_id", accountConfirm.account_id)
-            .update({ verify: true });
+            .update({ verify: "SUCCESS" });
           return response.json({
             message: "Registration confirmation successful",
           });
