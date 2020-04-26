@@ -34,23 +34,14 @@ class BookingController {
       const allBooking = await Database.table("bookings")
         .select("type_id", "date")
         .select(Database.raw('DATE_FORMAT(date, "%Y-%m-%d") as datevalue'))
-        .distinct("date")
-        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
-        .where({ type_id: params.type_id });
-
-      const allBooking2 = await Database.table("bookings")
-        .select("date")
-        .distinct("date")
         .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as dateformat'))
+        .distinct("date")
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
-        .where({ type_id: params.type_id });
+        .where({ type_id: params.type_id })
+        .groupBy("date")
+        .having("date", ">", new Date());
 
-      const sendbooking = [];
-
-      for (let index = 0; index < allBooking.length; index++) {
-        sendbooking[index] = { ...allBooking[index], ...allBooking2[index] };
-      }
-      return sendbooking;
+      return allBooking;
     } catch (error) {
       return error;
     }
