@@ -8,7 +8,6 @@ const Hash = use("Hash");
 const Env = use("Env");
 
 class DashboardBookingController {
-    
   //แสดงตารางนัดหมายตามประเภทและเวลาที่ระบุ
   async showBookingForHCARE({ request, response, params }) {
     try {
@@ -36,7 +35,7 @@ class DashboardBookingController {
         )
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .where({
-          status: "confirm successful",
+          status: "CONFIRM SUCCESS",
           type_id: params.type,
           date: params.date,
         });
@@ -242,7 +241,7 @@ class DashboardBookingController {
             .where("booking_id", booking_id)
             .update({
               account_id_from_user: dataForSendEmail.account.account_id,
-              status: "confirm successful",
+              status: "CONFIRM SUCCESS",
               comment_from_user: symptom,
               account_id_from_staff: accountid_doctor,
             });

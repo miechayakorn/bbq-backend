@@ -11,16 +11,16 @@ const { validateAll } = use("Validator");
 class UserRegisterController {
   // create user and sendmail to confirm
   async createUser({ request, response }) {
-    try {
-      const data = request.only([
-        "password",
-        "hn_number",
-        "email",
-        "telephone",
-        "first_name",
-        "last_name",
-      ]);
+    const data = request.only([
+      "password",
+      "hn_number",
+      "email",
+      "telephone",
+      "first_name",
+      "last_name",
+    ]);
 
+    try {
       await validateAll(data, RegisterRules);
 
       const accountUser = await Account.create({
