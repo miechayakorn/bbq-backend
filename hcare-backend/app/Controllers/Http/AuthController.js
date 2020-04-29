@@ -93,6 +93,7 @@ class AuthController {
         .json({ message: "You are not registered!", error });
     }
   }
+  
   async myprofile({ request, response, auth }) {
     try {
       return response.json({ user: await auth.getUser() });

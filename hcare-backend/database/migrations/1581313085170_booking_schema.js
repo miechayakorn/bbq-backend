@@ -16,6 +16,7 @@ class BookingSchema extends Schema {
       table.enum("check_attention", ["PRESENT", "ABSENT"]).defaultTo("ABSENT");
       table.string("token_booking_confirm").nullable();
       table.index("token_booking_confirm", "token_booking_confirm"); //INDEX
+      table.text("medical_note").nullable();
       table
         .enum("availability", ["AVAILABLE", "UNAVAILABLE"])
         .default("AVAILABLE");

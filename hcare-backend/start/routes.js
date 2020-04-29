@@ -29,8 +29,12 @@ Route.group(() => {
 }).middleware("guest");
 Route.get("/user/me", "AuthController.myprofile").middleware("auth"); //test token
 
-//staff register
-// Route.post("/staffRegister", "StaffRegisterController.createStaff");
+//staff and admin authentication (Register & Login)
+Route.post("/staff/register", "HealthcareStaffAuthController.createStaff");
+Route.get(
+  "/staff/register/confirm",
+  "HealthcareStaffAuthController.confirmRegister"
+);
 
 //staff modify
 Route.post("createtype", "CreateTypeController.create");
