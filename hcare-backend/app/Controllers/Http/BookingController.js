@@ -6,6 +6,7 @@ const Database = use("Database");
 const Mail = use("Mail");
 const Hash = use("Hash");
 const Env = use("Env");
+const DateFormat = use("App/Service/DateService");
 
 class BookingController {
   //แสดงประเภทการนัดหมาย
@@ -31,15 +32,21 @@ class BookingController {
   //แสดงวันที่ที่นัดประเภทที่เลือกมีให้บริการ
   async showDate({ request, response, params }) {
     try {
-      const allBooking = await Database.table("bookings")
+      let allBooking = await Database.table("bookings")
         .select("type_id", "date")
-        .select(Database.raw('DATE_FORMAT(date, "%Y-%m-%d") as datevalue'))
-        .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as dateformat'))
+        .select(Database.raw('DATE_FORMAT(date, "%Y-%m-%e") as datevalue'))
+        .select(Database.raw('DATE_FORMAT(date, "%W %e %M %Y") as dateformat'))
         .distinct("date")
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .where({ type_id: params.type_id })
         .groupBy("date")
         .having("date", ">", new Date());
+
+      for (let index = 0; index < allBooking.length; index++) {
+        allBooking[index].dateformat = DateFormat.ChangeDateFormat(
+          allBooking[index].dateformat
+        );
+      }
 
       return allBooking;
     } catch (error) {
@@ -71,7 +78,7 @@ class BookingController {
       const account = await auth.getUser();
 
       // find booking slot from bookingID that get from request to find in DB
-      const findBooking = await Database.select(
+      let findBooking = await Database.select(
         "booking_id",
         "type_name",
         "time_in",
@@ -79,12 +86,14 @@ class BookingController {
         "date",
         "status"
       )
-        .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as date'))
+        .select(Database.raw('DATE_FORMAT(date, "%W %e %M %Y") as date'))
         .from("bookings")
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
         .where("bookings.booking_id", dataFromBooking.booking_id)
         .first();
+
+      findBooking.date = DateFormat.ChangeDateFormat(findBooking.date);
 
       console.log(findBooking);
 

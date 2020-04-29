@@ -6,12 +6,13 @@ const Database = use("Database");
 const Mail = use("Mail");
 const Hash = use("Hash");
 const Env = use("Env");
+const DateFormat = use("App/Service/DateService");
 
 class DashboardBookingController {
   //แสดงตารางนัดหมายตามประเภทและเวลาที่ระบุ
   async showBookingForHCARE({ request, response, params }) {
     try {
-      const userBooking = await Database.select(
+      let userBooking = await Database.select(
         "booking_id",
         "account_id",
         "hn_number AS HNnumber ",
@@ -26,7 +27,7 @@ class DashboardBookingController {
         "link_meeting",
         "comment_from_staff"
       )
-        .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as date'))
+        .select(Database.raw('DATE_FORMAT(date, "%W %e %M %Y") as date'))
         .from("bookings")
         .innerJoin(
           "accounts",
@@ -40,10 +41,14 @@ class DashboardBookingController {
           date: params.date,
         });
 
-      console.log(userBooking);
+      for (let index = 0; index < userBooking.length; index++) {
+        userBooking[index].date = await DateFormat.ChangeDateFormat(
+          userBooking[index].date
+        );
+      }
       return userBooking;
-      return userBooking2;
     } catch (error) {
+      console.log(`Error: ${error}`);
       return response.status(500).send(error);
     }
   }
@@ -203,13 +208,14 @@ class DashboardBookingController {
         "date",
         "status"
       )
-        .select(Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as date'))
+        .select(Database.raw('DATE_FORMAT(date, "%W %e %M %Y") as date'))
         .from("bookings")
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
         .where("bookings.booking_id", booking_id)
         .first();
 
+      findBooking.date = DateFormat.ChangeDateFormat(findBooking.date);
       console.log(findBooking);
 
       if (userAccount) {

@@ -6,6 +6,7 @@ const Database = use("Database");
 const Mail = use("Mail");
 const Hash = use("Hash");
 const Env = use("Env");
+const DateFormat = use("App/Service/DateService");
 
 class AppointmentController {
   /*show appointment for patient*/
@@ -13,7 +14,7 @@ class AppointmentController {
     try {
       const account = await auth.getUser();
       if (account) {
-        const mybooking = await Database.select(
+        let mybooking = await Database.select(
           "account_id",
           "hn_number",
           "first_name",
@@ -26,7 +27,7 @@ class AppointmentController {
           "link_meeting"
         )
           .select(
-            Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as dateformat')
+            Database.raw('DATE_FORMAT(date, "%W %e %M %Y") as dateformat')
           )
           .from("bookings")
           .innerJoin(
@@ -49,6 +50,12 @@ class AppointmentController {
             status: "CONFIRM SUCCESS",
           })
           .orderBy("date", "time");
+
+        for (let index = 0; index < mybooking.length; index++) {
+          mybooking[index].dateformat = DateFormat.ChangeDateFormat(
+            mybooking[index].dateformat
+          );
+        }
 
         console.log(mybooking);
 
@@ -101,7 +108,7 @@ class AppointmentController {
           "link_meeting"
         )
           .select(
-            Database.raw('DATE_FORMAT(date, "%W %d %M %Y") as dateformat')
+            Database.raw('DATE_FORMAT(date, "%W %e %M %Y") as dateformat')
           )
           .from("bookings")
           .innerJoin(
@@ -124,6 +131,8 @@ class AppointmentController {
             status: "CONFIRM SUCCESS",
           })
           .first();
+
+        booking.dateformat = DateFormat.ChangeDateFormat(booking.dateformat);
 
         const sendBooking = { ...booking, ...doctor };
 
