@@ -24,7 +24,7 @@ class UserRegisterController {
       await validateAll(data, RegisterRules);
 
       const accountUser = await Account.create({
-        password: data.password,
+        // password: data.password,
         hn_number: data.hn_number,
         first_name: data.first_name,
         last_name: data.last_name,

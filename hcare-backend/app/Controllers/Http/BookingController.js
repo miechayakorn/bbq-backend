@@ -132,7 +132,7 @@ class BookingController {
             .where("booking_id", dataFromBooking.booking_id)
             .update({
               account_id_from_user: dataForSendEmail.account.account_id,
-              status: "WAITTING CONFIRM",
+              status: "WAITING CONFIRM",
               comment_from_user: dataFromBooking.symptom,
               token_booking_confirm: token,
             });

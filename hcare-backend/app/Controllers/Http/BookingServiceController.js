@@ -2,16 +2,23 @@
 const ServiceType = use("App/Models/ServiceType");
 const Database = use("Database");
 
-class CreateTypeController {
+class BookingServiceController {
   async create({ request, response }) {
     try {
-      let data = await request.only(["type_name"]);
+      const data = await request.only(["type_name"]);
       console.log(data);
       const typeCreate = await ServiceType.create({
         type_name: data.type_name,
       });
-      console.log(await Database.from("servicetypes"));
-      return typeCreate;
+      const newType = await Database.from("servicetypes").where(
+        "type_id",
+        typeCreate.$attributes.type_id
+      );
+
+      return response.json({
+        message: "Create new service successful",
+        type: newType,
+      });
     } catch (error) {
       return response.status(error.status).send(error);
     }
@@ -41,4 +48,4 @@ class CreateTypeController {
   //   }
 }
 
-module.exports = CreateTypeController;
+module.exports = BookingServiceController;

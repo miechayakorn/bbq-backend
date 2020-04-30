@@ -37,7 +37,7 @@ Route.get(
 );
 
 //staff modify
-Route.post("createtype", "CreateTypeController.create");
+Route.post("/servicetype/create", "BookingServiceController.create");
 Route.post("updatetype", "CreateTypeController.update");
 Route.post("createbooking/check", "CreateBookingController.checkWorktime");
 Route.post("createbooking", "CreateBookingController.store");
