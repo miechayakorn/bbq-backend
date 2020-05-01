@@ -1,10 +1,11 @@
 "use strict";
 
 const Database = use("Database");
-const StaffHealthcare = use("App/Models/StaffHealthcare");
+const Account = use("App/Models/Account");
 const Mail = use("Mail");
 const Hash = use("Hash");
 const Env = use("Env");
+const Token = use("App/Models/Token");
 
 class HealthcareStaffAuthController {
   async createStaff({ request, response }) {
@@ -15,29 +16,29 @@ class HealthcareStaffAuthController {
       "telephone",
       "first_name",
       "last_name",
-      "role",
+      "role_in_healthcare",
     ]);
     console.log(data);
     try {
-      const staff = await StaffHealthcare.create({
-        staff_id: data.staff_id,
+      const staff = await Account.create({
+        hn_number: data.staff_id,
+        email: data.email,
         password: data.password,
+        telephone: data.telephone,
         first_name: data.first_name,
         last_name: data.last_name,
-        email: data.email,
-        telephone: data.telephone,
+        role: "STAFF",
+        role_in_healthcare: data.role_in_healthcare,
         verify: "NOT VERIFY",
-        role: data.role,
-        privilege: "STAFF",
       });
 
       if (staff) {
-        const token = `${Date.now()}${staff.$attributes.staff_id}`;
+        const token = `${Date.now()}${staff.$attributes.hn_number}`;
         const tokenHash = await Hash.make(token);
 
         const dataForSendEmail = {
-          staff: await Database.table("staff_healthcares")
-            .where("staff_id", data.staff_id)
+          staff: await Database.table("accounts")
+            .where("account_id", staff.$attributes.account_id)
             .first(),
           tokenHash,
           url: Env.get("VUE_APP_BACKEND_URL"),
@@ -55,15 +56,14 @@ class HealthcareStaffAuthController {
           }
         );
         console.log(sendMail);
-
-        const s = await StaffHealthcare.query()
-          .where("sh_id", dataForSendEmail.staff.sh_id)
-          .update({ token: dataForSendEmail.tokenHash });
-        return "sendmail success";
-        // if (sendMail.rejectd == null) {
-        // } else {
-        //   return response.status(500).send("cannot sendmail");
-        // }
+        if (sendMail) {
+          await Token.create({
+            account_id: dataForSendEmail.staff.account_id,
+            token: tokenHash,
+            type: "STAFF REGISTER",
+          });
+          return "sendmail success";
+        }
       }
     } catch (err) {
       return response.status(500).send(err);
@@ -75,27 +75,53 @@ class HealthcareStaffAuthController {
     const query = request.get();
     try {
       if (query.token) {
-        const staffconfirm = await StaffHealthcare.findBy("token", query.token);
-        if (staffconfirm) {
-          await StaffHealthcare.query()
-            .where("sh_id", staffconfirm.sh_id)
-            .update({ verify: "SUCCESS", token: null });
+        const accountConfirm = await Token.findBy("token", query.token);
+        if (accountConfirm) {
+          await Account.query()
+            .where("account_id", accountConfirm.account_id)
+            .update({ verify: "SUCCESS" });
+
           response.redirect(`${Env.get("VUE_APP_FONTEND_URL")}/login`);
           //   return response.json({
           //     message: "Registration confirmation successful",
           //   });
         } else {
-          return response.status(304).json({
-            message: "This token is not available",
-          });
+          // return response.status(304).json({
+          //   message: "This token is not available",
+          // });
+          response.redirect(`${Env.get("VUE_APP_FONTEND_URL")}/login`);
         }
       } else {
-        return response.status(500).json({
-          message: "Token not exist",
-        });
+        // return response.status(500).json({
+        //   message: "Token not exist",
+        // });
+        response.redirect(`${Env.get("VUE_APP_FONTEND_URL")}/login`);
       }
     } catch (error) {
       return response.status(500).send(error);
+    }
+  }
+
+  async staffLogin({ request, response, auth }) {
+    try {
+      console.log("****************************************************");
+      if (auth.attempt(request.input("email"), request.input("password"))) {
+        let staff = await Account.findBy("email", request.input("email"));
+        let token = await auth.generate(staff);
+
+        let dataResp = {
+          first_name: staff.first_name,
+          last_name: staff.last_name,
+          role: staff.role,
+          type: token.type,
+          token: token.token,
+          refreshToken: token.refreshToken,
+        };
+
+        return response.json(dataResp);
+      }
+    } catch (error) {
+      return response.status(error.status).send(error);
     }
   }
 }

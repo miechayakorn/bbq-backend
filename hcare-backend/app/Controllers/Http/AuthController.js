@@ -79,6 +79,7 @@ class AuthController {
         let dataResp = {
           first_name: account.first_name,
           last_name: account.last_name,
+          role: account.role,
           type: token.type,
           token: token.token,
           refreshToken: token.refreshToken,
@@ -93,7 +94,7 @@ class AuthController {
         .json({ message: "You are not registered!", error });
     }
   }
-  
+
   async myprofile({ request, response, auth }) {
     try {
       return response.json({ user: await auth.getUser() });
