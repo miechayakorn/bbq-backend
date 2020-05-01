@@ -91,7 +91,7 @@ class AppointmentController {
             "work_times.working_id"
           )
           .innerJoin("accounts", "work_times.doctor_id", "accounts.account_id")
-          .where({ booking_id: params.booking_id, role: "doctor" })
+          .where({ booking_id: params.booking_id, role: "STAFF" })
           .first();
 
         // find booking and personal data of patient
