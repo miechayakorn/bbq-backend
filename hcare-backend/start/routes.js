@@ -19,7 +19,7 @@ const Route = use("Route");
 const Database = use("Database");
 
 Route.on("/").render("welcome");
-Route.post("/checktoken", "CheckTokenController.check").middleware("auth");
+Route.get("/checktoken", "CheckTokenController.check").middleware("auth");
 
 //user register & login
 Route.post("/register", "UserRegisterController.createUser");
