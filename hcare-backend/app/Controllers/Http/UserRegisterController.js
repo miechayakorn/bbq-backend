@@ -12,7 +12,7 @@ class UserRegisterController {
   // create user and sendmail to confirm
   async createUser({ request, response }) {
     const data = request.only([
-      "password",
+      // "password",
       "hn_number",
       "email",
       "telephone",
@@ -81,11 +81,9 @@ class UserRegisterController {
   async confirmRegister({ request, response }) {
     const query = request.get();
     try {
-      console.log("token");
-      console.log(query.token);
       if (query.token) {
         const accountConfirm = await Token.findBy("token", query.token);
-        console.log(accountConfirm);
+        
         if (accountConfirm) {
           await Account.query()
             .where("account_id", accountConfirm.account_id)
