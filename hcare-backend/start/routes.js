@@ -19,14 +19,8 @@ const Route = use("Route");
 const Database = use("Database");
 
 Route.on("/").render("welcome");
-<<<<<<< Updated upstream
+
 Route.get("/checktoken", "CheckTokenController.check").middleware("auth");
-=======
-
-
-Route.post("/checktoken", "CheckTokenController.check").middleware("auth");
->>>>>>> Stashed changes
-
 
 //user register & login
 Route.post("/register", "UserRegisterController.createUser");
@@ -36,8 +30,6 @@ Route.group(() => {
   Route.post("/login/confirm", "AuthController.confirmauthenticate");
 }).middleware("guest");
 Route.get("/user/me", "AuthController.myprofile").middleware("auth"); //test token
-
-
 
 //staff and admin authentication (Register & Login)
 Route.post("/staff/register", "HealthcareStaffAuthController.createStaff");
@@ -49,8 +41,6 @@ Route.post(
   "staff/login",
   "HealthcareStaffAuthController.staffLogin"
 ).middleware(["guest"]);
-
-
 
 //staff modify
 Route.post("/servicetype/create", "BookingServiceController.create");
