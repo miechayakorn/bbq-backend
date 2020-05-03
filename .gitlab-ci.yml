@@ -12,6 +12,8 @@ before_script:
 
 test:
   stage: test
+  only:
+    - develop
   script: echo "Running tests here!!"
 
 build-push-image:
