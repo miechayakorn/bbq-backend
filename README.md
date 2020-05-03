@@ -41,5 +41,8 @@ adonis migration:run
 ```
 adonis migration:rollback
 ```
+### Run docker-compose
+
+- `docker-compose up -d` or `./start.sh`
 
 
