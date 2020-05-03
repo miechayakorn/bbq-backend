@@ -1,34 +1,48 @@
-image : docker
-
-services :
-    - docker:dind
+image: docker:latest
+services:
+  - docker:dind
 
 stages:
   - test
+  - build_push
   - deploy
+
+before_script:
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
 
 test:
   stage: test
-  only:
-    - develop
-    - master
-    - feature/makeAppointment
-  script:
-    - echo run tests in this section
-    # - docker ps
-    # - docker-compose up -d
-    # - cd ./server
-    # - npm install
-    # - npm test
+  script: echo "Running tests here!!"
 
-step-deploy-prod:
+build-push-image:
+  stage: build_push
+  only:
+    - tags
+  except:
+    - branches
+  script:
+    - docker-compose build adonis
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+    - "Build Adonis is done"
+
+deploy-prod-adonis:
+  stage: deploy
+  only:
+    - tags
+  except:
+    - branches
+  script:
+    - docker stop hcare_adonis
+    - docker run -d $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+  when: manual
+
+deploy-prod-all:
   stage: deploy
   only:
     - master
-    - feature/makeAppointment
   script:
-    - docker ps
-    - docker-compose up -d
+    - docker-compose up -d --build
   when: manual
 
-
+after_script:
+  - docker ps
