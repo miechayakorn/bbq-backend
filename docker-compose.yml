@@ -32,7 +32,7 @@ services:
   ### ADONIS #####################################
   adonis:
     build: ./hcare-backend
-    image: $CI_REGISTRY_IMAGE:0.9
+    image: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
     container_name: hcare_adonis
     ports:
       - 3333:3333
