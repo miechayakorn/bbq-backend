@@ -38,13 +38,13 @@ deploy-prod-adonis:
     - docker run -d $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
   when: manual
 
-deploy-prod-all:
-  stage: deploy
-  only:
-    - master
-  script:
-    - docker-compose up -d --build
-  when: manual
+# deploy-prod-all:
+#   stage: deploy
+#   only:
+#     - master
+#   script:
+#     - docker-compose up -d --build
+#   when: manual
 
 after_script:
   - docker ps
