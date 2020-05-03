@@ -23,7 +23,7 @@ build-push-image:
   except:
     - branches
   script:
-    - docker-compose build adonis
+    - docker-compose build adonis --no-cache
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
     - echo "Build Adonis is done"
 
