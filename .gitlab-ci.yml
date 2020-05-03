@@ -35,7 +35,7 @@ deploy-prod-adonis:
     - branches
   script:
     - docker stop hcare_adonis
-    - docker run -d $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+    - docker run -p 3333:3333 -d $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
   when: manual
 
 # deploy-prod-all:
