@@ -17,7 +17,7 @@ module.exports = {
   |
   */
  origin: function (currentOrigin) {
-  return currentOrigin === 'hcare-kmutt.web.com'
+  return currentOrigin === 'hcare-kmutt.web.app'
 },
 
   /*
