@@ -49,6 +49,7 @@ class AppointmentController {
             account_id_from_user: account.account_id,
             status: "CONFIRM SUCCESS",
           })
+          .whereRaw("date > ?", [new Date()])
           .orderBy("date", "time");
 
         for (let index = 0; index < mybooking.length; index++) {
