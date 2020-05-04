@@ -7,7 +7,7 @@ class CheckTokenController {
       if (account) {
         return response.status(200).send();
       } else {
-        return response.status(401).send();
+        return response.status(401).send("invalid signature");
       }
     } catch (error) {
       response.status(error.status).send(error);
