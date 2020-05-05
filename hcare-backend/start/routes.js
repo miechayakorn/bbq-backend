@@ -33,14 +33,13 @@ Route.get("/user/me", "AuthController.myprofile").middleware("auth"); //test tok
 
 //staff and admin authentication (Register & Login)
 Route.post("/staff/register", "HealthcareStaffAuthController.createStaff");
-Route.get(
-  "/staff/register/confirm",
-  "HealthcareStaffAuthController.confirmRegister"
-);
-Route.post(
-  "staff/login",
-  "HealthcareStaffAuthController.staffLogin"
-).middleware(["guest"]);
+Route.group(() => {
+  Route.get(
+    "/staff/register/confirm",
+    "HealthcareStaffAuthController.confirmRegister"
+  );
+  Route.post("staff/login", "HealthcareStaffAuthController.staffLogin");
+}).middleware(["guest"]);
 
 //staff modify
 Route.post("/servicetype/create", "BookingServiceController.create");
@@ -71,17 +70,20 @@ Route.group(() => {
 }).middleware("auth");
 
 //Dashboard Booking
-Route.get(
-  "/showbooking/:type/:date",
-  "DashboardBookingController.showBookingForHCARE"
-);
-Route.post(
-  "/patientbooking/edit",
-  "DashboardBookingController.editPatientBooking"
-);
-Route.post("/cancel", "DashboardBookingController.cancelAppointment"); // ผู้ป่วยยกเลิกก็ใช้ controller นี้
-Route.post(
-  "/booking/healthcare",
-  "DashboardBookingController.submitBookingFromHealthcare"
-);
+Route.group(() => {
+  Route.get(
+    "/showbooking/:type/:date",
+    "DashboardBookingController.showBookingForHCARE"
+  );
+  Route.post(
+    "/patientbooking/edit",
+    "DashboardBookingController.editPatientBooking"
+  );
+  Route.post("/cancel", "DashboardBookingController.cancelAppointment");
+  Route.post(
+    "/booking/healthcare",
+    "DashboardBookingController.submitBookingFromHealthcare"
+  );
+}).middleware(["auth"]);
+
 //Route.get("/patientbooking/detail/:booking_id", "BookingController.patientDetail");
