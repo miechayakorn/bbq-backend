@@ -103,22 +103,25 @@ class HealthcareStaffAuthController {
   }
 
   async staffLogin({ request, response, auth }) {
+    const { email, password } = request.only(["email", "password"]);
+    console.log(email, password);
     try {
-      console.log("****************************************************");
-      if (auth.attempt(request.input("email"), request.input("password"))) {
-        let staff = await Account.findBy("email", request.input("email"));
-        let token = await auth.generate(staff);
-
-        let dataResp = {
-          first_name: staff.first_name,
-          last_name: staff.last_name,
-          role: staff.role,
-          type: token.type,
-          token: token.token,
-          refreshToken: token.refreshToken,
-        };
-
-        return response.json(dataResp);
+      if (await auth.attempt(email, password)) {
+        const staff = await Account.findBy("email", request.input("email"));
+        const token = await auth.generate(staff);
+        if (staff.role == "STAFF" || staff.role == "ADMIN") {
+          let dataResp = {
+            first_name: staff.first_name,
+            last_name: staff.last_name,
+            role: staff.role,
+            type: token.type,
+            token: token.token,
+            refreshToken: token.refreshToken,
+          };
+          return response.json(dataResp);
+        }
+        console.log();
+        return response.status(401).send("no permission");
       }
     } catch (error) {
       return response.status(error.status).send(error);

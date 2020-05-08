@@ -19,7 +19,7 @@ class UserRegisterController {
       "first_name",
       "last_name",
     ]);
-
+    console.log(data);
     try {
       await validateAll(data, RegisterRules);
 
@@ -83,7 +83,7 @@ class UserRegisterController {
     try {
       if (query.token) {
         const accountConfirm = await Token.findBy("token", query.token);
-        
+
         if (accountConfirm) {
           await Account.query()
             .where("account_id", accountConfirm.account_id)
