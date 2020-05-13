@@ -7,11 +7,9 @@ const Env = use("Env");
 
 class AuthController {
   async authenticate({ request, auth, response }) {
-    const { email } = request.only(["email"]);
-
-    console.log(email);
-
     try {
+      const { email } = request.only(["email"]);
+
       const account = await Database.select("*")
         .from("accounts")
         .where("email", email)
@@ -20,45 +18,53 @@ class AuthController {
       console.log(account);
 
       if (account) {
-        const digits = "0123456789";
-        var otp = "";
-        for (let i = 0; i < 6; i++) {
-          otp = otp + digits[Math.floor(Math.random() * 10)];
-        }
-        console.log(otp);
+        if (account.role == "USER") {
+          const digits = "0123456789";
+          var otp = "";
+          for (let i = 0; i < 6; i++) {
+            otp = otp + digits[Math.floor(Math.random() * 10)];
+          }
+          console.log(otp);
 
-        const dataSendEmail = {
-          account: account.hn_number,
-          email: account.email,
-          otp,
-          url: Env.get("VUE_APP_FONTEND_URL"),
-        };
-        console.log(dataSendEmail);
+          const dataSendEmail = {
+            account: account.hn_number,
+            email: account.email,
+            otp,
+            url: Env.get("VUE_APP_FONTEND_URL"),
+          };
+          console.log(dataSendEmail);
 
-        const mail = await Mail.send("login", dataSendEmail, (message) => {
-          message
-            .to(account.email)
-            .from("Health Care")
-            .subject("Login to HCARE");
-        });
-
-        console.log(mail);
-
-        await Account.query()
-          .where("account_id", account.account_id)
-          .update({
-            password: await Hash.make(dataSendEmail.otp),
+          const mail = await Mail.send("login", dataSendEmail, (message) => {
+            message
+              .to(account.email)
+              .from("Health Care")
+              .subject("Login to HCARE");
           });
 
-        const accountLogin = Database.select("*")
-          .from("accounts")
-          .where("email", email);
+          console.log(mail);
 
-        if (account.password != accountLogin.password) {
-          return "send mail for login successful";
+          await Account.query()
+            .where("account_id", account.account_id)
+            .update({
+              password: await Hash.make(dataSendEmail.otp),
+            });
+
+          const accountLogin = Database.select("*")
+            .from("accounts")
+            .where("email", email);
+
+          if (account.password != accountLogin.password) {
+            return "send mail for login successful";
+          } else {
+            return "password don't have changed";
+          }
         } else {
-          return "password don't have changed";
+          return response
+            .status(403)
+            .send("You don't have permission to user login");
         }
+      } else {
+        return response.status(401).send();
       }
     } catch (error) {
       console.log(error);

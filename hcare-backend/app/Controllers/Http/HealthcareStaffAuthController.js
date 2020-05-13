@@ -81,7 +81,7 @@ class HealthcareStaffAuthController {
             .where("account_id", accountConfirm.account_id)
             .update({ verify: "SUCCESS" });
 
-          response.redirect(`${Env.get("VUE_APP_FONTEND_URL")}/login`);
+          response.redirect(`${Env.get("VUE_APP_FONTEND_URL")}/admin/login`);
           //   return response.json({
           //     message: "Registration confirmation successful",
           //   });
@@ -89,13 +89,13 @@ class HealthcareStaffAuthController {
           // return response.status(304).json({
           //   message: "This token is not available",
           // });
-          response.redirect(`${Env.get("VUE_APP_FONTEND_URL")}/login`);
+          response.redirect(`${Env.get("VUE_APP_FONTEND_URL")}/admin/login`);
         }
       } else {
         // return response.status(500).json({
         //   message: "Token not exist",
         // });
-        response.redirect(`${Env.get("VUE_APP_FONTEND_URL")}/login`);
+        response.redirect(`${Env.get("VUE_APP_FONTEND_URL")}/admin/login`);
       }
     } catch (error) {
       return response.status(500).send(error);
