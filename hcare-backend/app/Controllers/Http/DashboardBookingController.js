@@ -10,43 +10,51 @@ const DateFormat = use("App/Service/DateService");
 
 class DashboardBookingController {
   //แสดงตารางนัดหมายตามประเภทและเวลาที่ระบุ
-  async showBookingForHCARE({ request, response, params }) {
+  async showBookingForHCARE({ request, response, params, auth }) {
     try {
-      let userBooking = await Database.select(
-        "booking_id",
-        "account_id",
-        "hn_number AS HNnumber ",
-        "first_name AS ชื่อ",
-        "last_name AS นามสกุล",
-        "time_in AS เวลานัด",
-        "type_id",
-        "date",
-        "email",
-        "telephone",
-        "comment_from_user as symptom",
-        "link_meeting",
-        "comment_from_staff"
-      )
-        .select(Database.raw('DATE_FORMAT(date, "%W %e %M %Y") as date'))
-        .from("bookings")
-        .innerJoin(
-          "accounts",
-          "bookings.account_id_from_user",
-          "accounts.account_id"
+      const accountHC = await auth.getUser();
+      if (accountHC.role == "STAFF" || accountHC.role == "ADMIN") {
+        let userBooking = await Database.select(
+          "booking_id",
+          "account_id",
+          "hn_number AS HNnumber ",
+          "first_name AS ชื่อ",
+          "last_name AS นามสกุล",
+          "time_in AS เวลานัด",
+          "type_id",
+          "date",
+          "email",
+          "telephone",
+          "comment_from_user as symptom",
+          "link_meeting",
+          "comment_from_staff"
         )
-        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
-        .where({
-          status: "CONFIRM SUCCESS",
-          type_id: params.type,
-          date: params.date,
-        });
+          .select(Database.raw('DATE_FORMAT(date, "%W %e %M %Y") as date'))
+          .from("bookings")
+          .innerJoin(
+            "accounts",
+            "bookings.account_id_from_user",
+            "accounts.account_id"
+          )
+          .innerJoin(
+            "work_times",
+            "bookings.working_id",
+            "work_times.working_id"
+          )
+          .where({
+            status: "CONFIRM SUCCESS",
+            type_id: params.type,
+            date: params.date,
+          });
 
-      for (let index = 0; index < userBooking.length; index++) {
-        userBooking[index].date = await DateFormat.ChangeDateFormat(
-          userBooking[index].date
-        );
+        for (let index = 0; index < userBooking.length; index++) {
+          userBooking[index].date = await DateFormat.ChangeDateFormat(
+            userBooking[index].date
+          );
+        }
+        return userBooking;
       }
-      return userBooking;
+      return response.status(403).send();
     } catch (error) {
       console.log(`Error: ${error}`);
       return response.status(500).send(error);
@@ -54,35 +62,45 @@ class DashboardBookingController {
   }
 
   /*เพิ่ม link และ note สำหรับ Health care*/
-  async editPatientBooking({ request, response }) {
+  async editPatientBooking({ request, response, auth }) {
     try {
-      const dataEditPatientBook = request.all(["booking_id", "link", "note"]);
-      console.log(dataEditPatientBook);
+      const accountHC = await auth.getUser();
+      if (accountHC.role == "STAFF" || accountHC.role == "ADMIN") {
+        const dataEditPatientBook = request.all(["booking_id", "link", "note"]);
+        console.log(dataEditPatientBook);
 
-      const booking = await Booking.find(dataEditPatientBook.booking_id);
-      if (booking) {
-        if (dataEditPatientBook.link && dataEditPatientBook.note) {
-          await Booking.query().where("booking_id", booking.booking_id).update({
-            link_meeting: dataEditPatientBook.link,
-            comment_from_staff: dataEditPatientBook.note,
+        const booking = await Booking.find(dataEditPatientBook.booking_id);
+        if (booking) {
+          if (dataEditPatientBook.link && dataEditPatientBook.note) {
+            await Booking.query()
+              .where("booking_id", booking.booking_id)
+              .update({
+                link_meeting: dataEditPatientBook.link,
+                comment_from_staff: dataEditPatientBook.note,
+              });
+          } else if (dataEditPatientBook.note) {
+            await Booking.query()
+              .where("booking_id", booking.booking_id)
+              .update({
+                comment_from_staff: dataEditPatientBook.note,
+              });
+          } else if (dataEditPatientBook.link) {
+            await Booking.query()
+              .where("booking_id", booking.booking_id)
+              .update({
+                link_meeting: dataEditPatientBook.link,
+              });
+          }
+          let returnBooking = await Booking.find(booking.booking_id);
+          return response.json({
+            message: "booking update successful!",
+            booking: returnBooking,
           });
-        } else if (dataEditPatientBook.note) {
-          await Booking.query().where("booking_id", booking.booking_id).update({
-            comment_from_staff: dataEditPatientBook.note,
-          });
-        } else if (dataEditPatientBook.link) {
-          await Booking.query().where("booking_id", booking.booking_id).update({
-            link_meeting: dataEditPatientBook.link,
-          });
+        } else {
+          return "Have no this booking";
         }
-        let returnBooking = await Booking.find(booking.booking_id);
-        return response.json({
-          message: "booking update successful!",
-          booking: returnBooking,
-        });
-      } else {
-        return "Have no this booking";
       }
+      return response.status(403).send();
     } catch (error) {
       response.status(500).send(error);
     }
@@ -122,140 +140,147 @@ class DashboardBookingController {
   }*/
 
   //ยกเลิกการจองนัดของผู้ป่วยผ่านหน้า Dashboard
-  async cancelAppointment({ request, response }) {
+  async cancelAppointment({ request, response, auth }) {
     try {
-      const dataCancel = await request.only(["booking_id"]);
-      console.log(dataCancel.booking_id);
-      if (dataCancel.booking_id) {
-        const booking = await Booking.find(dataCancel.booking_id);
-        console.log(booking.status);
-        if (booking.status != null) {
-          await Booking.query()
-            .where("booking_id", dataCancel.booking_id)
-            .update({
-              status: null,
-              comment_from_user: null,
-              comment_from_staff: null,
-              token_booking_confirm: null,
-              link_meeting: null,
-              account_id_from_user: null,
-              account_id_from_staff: null,
+      const accountHC = await auth.getUser();
+      if (accountHC.role == "STAFF" || accountHC.role == "ADMIN") {
+        const dataCancel = await request.only(["booking_id"]);
+        console.log(dataCancel.booking_id);
+        if (dataCancel.booking_id) {
+          const booking = await Booking.find(dataCancel.booking_id);
+          console.log(booking.status);
+          if (booking.status != null) {
+            await Booking.query()
+              .where("booking_id", dataCancel.booking_id)
+              .update({
+                status: null,
+                comment_from_user: null,
+                comment_from_staff: null,
+                token_booking_confirm: null,
+                link_meeting: null,
+                account_id_from_user: null,
+                account_id_from_staff: null,
+              });
+            const bookingUpdate = await Database.from("bookings").where(
+              "booking_id",
+              booking.booking_id
+            );
+            return response.json({
+              message: "clear schedule successful",
+              booking: bookingUpdate,
             });
-          const bookingUpdate = await Database.from("bookings").where(
-            "booking_id",
-            booking.booking_id
-          );
-          return response.json({
-            message: "clear schedule successful",
-            booking: bookingUpdate,
-          });
+          } else {
+            return response
+              .status(304)
+              .json({ message: "Don't have booking in database" });
+          }
         } else {
           return response
-            .status(304)
-            .json({ message: "Don't have booking in database" });
+            .status(500)
+            .json({ message: "Booking ID does not exist" });
         }
-      } else {
-        return response
-          .status(500)
-          .json({ message: "Booking ID does not exist" });
       }
+      return response.status(403).send();
     } catch (error) {
       response.status(500).send(error);
     }
   }
 
   //จองตารางนัดหมายโดย Healthcare
-  async submitBookingFromHealthcare({ request, response }) {
+  async submitBookingFromHealthcare({ request, response, auth }) {
     try {
-      const {
-        booking_id,
-        hn_number,
-        symptom,
-        accountid_doctor,
-      } = request.only([
-        "booking_id",
-        "hn_number",
-        "symptom",
-        "accountid_doctor",
-      ]);
-      console.log(booking_id);
-      console.log(hn_number);
-      console.log(symptom);
-      console.log(accountid_doctor);
+      const accountHC = await auth.getUser();
+      if (accountHC.role == "STAFF" || accountHC.role == "ADMIN") {
+        const {
+          booking_id,
+          hn_number,
+          symptom,
+          accountid_doctor,
+        } = request.only([
+          "booking_id",
+          "hn_number",
+          "symptom",
+          "accountid_doctor",
+        ]);
 
-      //find account from hn_number
-      const userAccount = await Database.select(
-        "account_id",
-        "email",
-        "first_name",
-        "last_name"
-      )
-        .from("accounts")
-        .where("hn_number", hn_number)
-        .first();
+        //find account from hn_number
+        const userAccount = await Database.select(
+          "account_id",
+          "email",
+          "first_name",
+          "last_name"
+        )
+          .from("accounts")
+          .where("hn_number", hn_number)
+          .first();
 
-      console.log(userAccount);
-      console.log(
-        "************************submitBookingFromHealthcare********************************"
-      );
+        // find booking slot from bookingID that get from request to find in DB
+        const findBooking = await Database.select(
+          "booking_id",
+          "type_name",
+          "time_in",
+          "time_out",
+          "date",
+          "status"
+        )
+          .select(Database.raw('DATE_FORMAT(date, "%W %e %M %Y") as date'))
+          .from("bookings")
+          .innerJoin(
+            "work_times",
+            "bookings.working_id",
+            "work_times.working_id"
+          )
+          .innerJoin(
+            "servicetypes",
+            "work_times.type_id",
+            "servicetypes.type_id"
+          )
+          .where("bookings.booking_id", booking_id)
+          .first();
 
-      // find booking slot from bookingID that get from request to find in DB
-      const findBooking = await Database.select(
-        "booking_id",
-        "type_name",
-        "time_in",
-        "time_out",
-        "date",
-        "status"
-      )
-        .select(Database.raw('DATE_FORMAT(date, "%W %e %M %Y") as date'))
-        .from("bookings")
-        .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
-        .innerJoin("servicetypes", "work_times.type_id", "servicetypes.type_id")
-        .where("bookings.booking_id", booking_id)
-        .first();
+        findBooking.date = DateFormat.ChangeDateFormat(findBooking.date);
+        console.log(findBooking);
 
-      findBooking.date = DateFormat.ChangeDateFormat(findBooking.date);
-      console.log(findBooking);
+        if (userAccount) {
+          // check account not null
 
-      if (userAccount) {
-        // check account not null
+          if (!findBooking.status) {
+            // check booking status available
 
-        if (!findBooking.status) {
-          // check booking status available
+            const dataForSendEmail = {
+              account: userAccount,
+              bookingSlot: findBooking,
+              url: Env.get("VUE_APP_FONTEND_URL"),
+            };
 
-          const dataForSendEmail = {
-            account: userAccount,
-            bookingSlot: findBooking,
-            url: Env.get("VUE_APP_FONTEND_URL"),
-          };
+            console.log(dataForSendEmail);
 
-          console.log(dataForSendEmail);
+            const subject =
+              "Boooking By Health Care  " +
+              dataForSendEmail.bookingSlot.type_name.toString();
 
-          const subject =
-            "Boooking By Health Care  " +
-            dataForSendEmail.bookingSlot.type_name.toString();
-
-          await Mail.send("sendmailbooking", dataForSendEmail, (message) => {
-            message
-              .to(userAccount.email)
-              .from("Mail from healthcare")
-              .subject(subject);
-          });
-
-          await Database.table("bookings")
-            .where("booking_id", booking_id)
-            .update({
-              account_id_from_user: dataForSendEmail.account.account_id,
-              status: "CONFIRM SUCCESS",
-              comment_from_user: symptom,
-              account_id_from_staff: accountid_doctor,
+            await Mail.send("sendmailbooking", dataForSendEmail, (message) => {
+              message
+                .to(userAccount.email)
+                .from("Mail from healthcare")
+                .subject(subject);
             });
 
-          return "send mail success";
+            await Database.table("bookings")
+              .where("booking_id", booking_id)
+              .update({
+                account_id_from_user: dataForSendEmail.account.account_id,
+                status: "CONFIRM SUCCESS",
+                comment_from_user: symptom,
+                account_id_from_staff: accountid_doctor,
+              });
+
+            return "send mail success";
+          }
+          return response.status(400).send("This booking unavailable");
         }
-        return response.status(400).send("This booking unavailable");
       }
+      return response.status(403).send();
     } catch (error) {
       return response.status(500).send(error);
     }

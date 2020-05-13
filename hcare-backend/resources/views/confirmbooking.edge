@@ -581,7 +581,9 @@
                                 margin: 0;
                               "
                             >
-                              ประเภทการนัดหมาย&nbsp;
+                              <span style="font-size: 15px;"
+                                >ประเภทการนัดหมาย&nbsp;</span
+                              >
                               <span style="font-size: 20px;"
                                 ><strong>{{ bookingSlot.type_name }}</strong>
                               </span>
@@ -595,7 +597,7 @@
                                 margin: 0;
                               "
                             >
-                              เวลา
+                              <span style="font-size: 15px;">เวลา</span>
                               <span style="font-size: 20px;"
                                 ><strong
                                   >{{ bookingSlot.time_in }} -
@@ -612,7 +614,6 @@
                                 margin: 0;
                               "
                             >
-                            
                               <span style="font-size: 20px;"
                                 ><strong>{{ bookingSlot.date }}</strong></span
                               >
@@ -915,9 +916,7 @@
                                 margin: 0;
                               "
                             >
-                              <span style="font-size: 16px;"
-                                >โทรแจ้งทาง Healthcare : 080-1111-111</span
-                              >
+                              <span style="font-size: 16px;"></span>
                             </p>
                           </div>
                         </div>
@@ -978,7 +977,9 @@
                             >
                           </a>
                           <a
-                            href="{{ url }}/bookings/emailcancel?booking_id={{bookingSlot.booking_id}}"
+                            href="{{ url }}/bookings/emailcancel?booking_id={{
+                              bookingSlot.booking_id
+                            }}"
                             style="
                               text-decoration: none;
                               display: inline-block;
