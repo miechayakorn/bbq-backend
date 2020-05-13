@@ -77,7 +77,6 @@ class AppointmentController {
   async myAppointmentDetail({ request, response, params, auth }) {
     try {
       const account = await auth.getUser();
-
       if (account) {
         //find doctor in account table
         const doctor = await Database.select(
@@ -137,9 +136,11 @@ class AppointmentController {
 
         const sendBooking = { ...booking, ...doctor };
 
-        console.log(sendBooking);
-
-        return sendBooking;
+        if (account.account_id == booking.account_id) {
+          return sendBooking;
+        } else {
+          return response.status(403).send();
+        }
       } else {
         return response.status(401).send();
       }
