@@ -76,6 +76,11 @@ class BookingController {
       console.log(dataFromBooking);
 
       const account = await auth.getUser();
+      console.log(account);
+
+      if (account.verify == "NOT VERIFY") {
+        return response.json({ message: "Please verrify account" });
+      }
 
       // find booking slot from bookingID that get from request to find in DB
       let findBooking = await Database.select(
