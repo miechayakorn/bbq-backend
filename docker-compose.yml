@@ -25,6 +25,7 @@ services:
       MYSQL_USER: hcare
       MYSQL_PASSWORD: hcare6018
       MYSQL_ROOT_PASSWORD: hcare6018
+      TZ: Asia/Bangkok
     restart: always
     networks:
       - api-network
