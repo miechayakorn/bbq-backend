@@ -77,7 +77,6 @@ class AppointmentController {
   async myAppointmentDetail({ request, response, params, auth }) {
     try {
       const account = await auth.getUser();
-
       if (account) {
         //find doctor in account table
         const doctor = await Database.select(
@@ -137,9 +136,11 @@ class AppointmentController {
 
         const sendBooking = { ...booking, ...doctor };
 
-        console.log(sendBooking);
-
-        return sendBooking;
+        if (account.account_id == booking.account_id) {
+          return sendBooking;
+        } else {
+          return response.status(403).send();
+        }
       } else {
         return response.status(401).send();
       }
@@ -153,11 +154,15 @@ class AppointmentController {
   async cancelAppointmentFromAppointmentDetail({ request, response, auth }) {
     try {
       const { booking_id } = await request.only(["booking_id"]);
+
       if (booking_id) {
         const booking = await Booking.find(booking_id);
-        const account = await auth.getUser();
+        console.log(booking);
 
-        if (booking.status == "confirm successful") {
+        const account = await auth.getUser();
+        console.log(account);
+
+        if (booking.status == "CONFIRM SUCCESS") {
           await Booking.query()
             .where({
               booking_id: booking_id,
@@ -168,6 +173,7 @@ class AppointmentController {
               comment_from_user: null,
               comment_from_staff: null,
               token_booking_confirm: null,
+              medical_note: null,
               link_meeting: null,
               account_id_from_user: null,
               account_id_from_staff: null,
