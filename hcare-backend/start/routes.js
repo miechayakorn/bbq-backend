@@ -79,11 +79,11 @@ Route.group(() => {
     "/patientbooking/edit",
     "DashboardBookingController.editPatientBooking"
   );
-  Route.post("/cancel", "DashboardBookingController.cancelAppointment");
   Route.post(
     "/booking/healthcare",
     "DashboardBookingController.submitBookingFromHealthcare"
   );
 }).middleware(["auth"]);
+Route.post("/cancel", "DashboardBookingController.cancelAppointment");
 
 //Route.get("/patientbooking/detail/:booking_id", "BookingController.patientDetail");

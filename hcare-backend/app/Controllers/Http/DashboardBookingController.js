@@ -142,45 +142,41 @@ class DashboardBookingController {
   //ยกเลิกการจองนัดของผู้ป่วยผ่านหน้า Dashboard
   async cancelAppointment({ request, response, auth }) {
     try {
-      const accountHC = await auth.getUser();
-      if (accountHC.role == "STAFF" || accountHC.role == "ADMIN") {
-        const dataCancel = await request.only(["booking_id"]);
-        console.log(dataCancel.booking_id);
-        if (dataCancel.booking_id) {
-          const booking = await Booking.find(dataCancel.booking_id);
-          console.log(booking.status);
-          if (booking.status != null) {
-            await Booking.query()
-              .where("booking_id", dataCancel.booking_id)
-              .update({
-                status: null,
-                comment_from_user: null,
-                comment_from_staff: null,
-                token_booking_confirm: null,
-                link_meeting: null,
-                account_id_from_user: null,
-                account_id_from_staff: null,
-              });
-            const bookingUpdate = await Database.from("bookings").where(
-              "booking_id",
-              booking.booking_id
-            );
-            return response.json({
-              message: "clear schedule successful",
-              booking: bookingUpdate,
+      const dataCancel = await request.only(["booking_id"]);
+      console.log(dataCancel.booking_id);
+      if (dataCancel.booking_id) {
+        const booking = await Booking.find(dataCancel.booking_id);
+        console.log(booking.status);
+        if (booking.status != null) {
+          await Booking.query()
+            .where("booking_id", dataCancel.booking_id)
+            .update({
+              status: null,
+              comment_from_user: null,
+              comment_from_staff: null,
+              token_booking_confirm: null,
+              link_meeting: null,
+              account_id_from_user: null,
+              account_id_from_staff: null,
             });
-          } else {
-            return response
-              .status(304)
-              .json({ message: "Don't have booking in database" });
-          }
+          const bookingUpdate = await Database.from("bookings").where(
+            "booking_id",
+            booking.booking_id
+          );
+          return response.json({
+            message: "clear schedule successful",
+            booking: bookingUpdate,
+          });
         } else {
           return response
-            .status(500)
-            .json({ message: "Booking ID does not exist" });
+            .status(304)
+            .json({ message: "Don't have booking in database" });
         }
+      } else {
+        return response
+          .status(500)
+          .json({ message: "Booking ID does not exist" });
       }
-      return response.status(403).send();
     } catch (error) {
       response.status(500).send(error);
     }
