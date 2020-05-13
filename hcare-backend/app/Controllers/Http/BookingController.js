@@ -29,7 +29,7 @@ class BookingController {
     }
   }
 
-  //แสดงวันที่ที่นัดประเภทที่เลือกมีให้บริการ
+  //แสดงวันที่ของนัดประเภทที่เลือกมีให้บริการ
   async showDate({ request, response, params }) {
     try {
       let allBooking = await Database.table("bookings")
@@ -40,13 +40,14 @@ class BookingController {
         .innerJoin("work_times", "bookings.working_id", "work_times.working_id")
         .where({ type_id: params.type_id })
         .groupBy("date")
-        .having("date", ">", new Date());
+        .having("date", ">=", new Date().toISOString().slice(0, 10));
 
       for (let index = 0; index < allBooking.length; index++) {
         allBooking[index].dateformat = DateFormat.ChangeDateFormat(
           allBooking[index].dateformat
         );
       }
+      console.log(allBooking);
 
       return allBooking;
     } catch (error) {

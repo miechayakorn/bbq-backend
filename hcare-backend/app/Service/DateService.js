@@ -2,17 +2,13 @@
 
 class DateService {
   static ChangeDateFormat = (date) => {
-    console.log("====================== ChangeDateFormat");
     const subDate = date.split(" ");
 
     const dayOfWeek = this.changeDay(subDate[0]);
-    console.log(dayOfWeek);
 
     const monthOfYear = this.changeMonth(subDate[2]);
-    console.log(monthOfYear);
 
     const year = parseInt(subDate[3]) + 543;
-    console.log(year);
 
     return `วัน${dayOfWeek} ที่ ${subDate[1]} ${monthOfYear} ${year}`;
   };
