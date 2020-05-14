@@ -186,19 +186,18 @@ class DashboardBookingController {
   async submitBookingFromHealthcare({ request, response, auth }) {
     try {
       const accountHC = await auth.getUser();
+      const {
+        booking_id,
+        hn_number,
+        symptom,
+        accountid_doctor,
+      } = request.only([
+        "booking_id",
+        "hn_number",
+        "symptom"
+      ]);
       if (accountHC.role == "STAFF" || accountHC.role == "ADMIN") {
-        const {
-          booking_id,
-          hn_number,
-          symptom,
-          accountid_doctor,
-        } = request.only([
-          "booking_id",
-          "hn_number",
-          "symptom",
-          "accountid_doctor",
-        ]);
-
+        
         //find account from hn_number
         const userAccount = await Database.select(
           "account_id",
