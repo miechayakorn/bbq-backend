@@ -32,7 +32,7 @@ deploy-prod-adonis:
   script:
     - docker kill hcare_nginx hcare_adonis
     - docker rm hcare_nginx hcare_adonis
-    - cat .env.docker > .env.docker
+    - cat hcare-backend/.env.docker > hcare-backend/.env.docker
     - docker-compose up -d --build
   when: manual
 
