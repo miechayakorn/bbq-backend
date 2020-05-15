@@ -3,8 +3,7 @@ FROM node:12-alpine as base
 
 WORKDIR /src
 COPY package.json /src/
-COPY .env.docker .env.docker
-RUN cat .env.docker > .env
+COPY .env.docker .env
 COPY ./init.sh init.sh
 COPY . /src
 RUN npm i -g @adonisjs/cli pm2
