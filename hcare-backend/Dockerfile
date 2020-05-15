@@ -15,8 +15,7 @@ FROM base as production
 
 ENV NODE_ENV=production
 RUN npm install
-#CMD ["npm", "run", "serve"]
-CMD ["adonis", "serve", "--dev"]
-
+# CMD ["adonis", "serve", "--dev"]
+CMD ["pm2-runtime", "start", "server.js"]
 
 
