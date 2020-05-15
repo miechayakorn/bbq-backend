@@ -1,4 +1,4 @@
-[![pipeline status](https://gitlab.com/miechayakorn/BBQ-backend/badges/1.0.1/pipeline.svg)](https://gitlab.com/miechayakorn/BBQ-backend/-/commits/1.0.1)
+[![pipeline status](https://gitlab.com/miechayakorn/BBQ-backend/badges/1.0/pipeline.svg)](https://gitlab.com/miechayakorn/BBQ-backend/-/commits/1.0)
 ## Adonis
 ### --- ขั้นตอนการสร้าง table ใน DB
 1. สร้าง table ใน local
