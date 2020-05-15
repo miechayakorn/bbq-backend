@@ -6,7 +6,6 @@ services:
     container_name: hcare_nginx
     ports:
       - 80:80
-    # - 443:443
     volumes:
       - ./nginx:/etc/nginx
       - ./www/:/usr/share/nginx/html
@@ -25,6 +24,7 @@ services:
       MYSQL_USER: $MYSQL_USER
       MYSQL_PASSWORD: $MYSQL_PASSWORD
       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      TZ: Asia/Bangkok
     restart: always
     networks:
       - api-network
@@ -39,8 +39,6 @@ services:
     restart: always
     networks:
       - api-network
-    # links:
-    #   - mysql
 
   ### PHPMYADMIN #####################################
   phpmyadmin:
