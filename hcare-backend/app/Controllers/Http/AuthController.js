@@ -15,6 +15,7 @@ class AuthController {
         .where("email", email)
         .first();
 
+      console.log("------------------ Account ---------------------");
       console.log(account);
 
       if (account) {
@@ -24,6 +25,8 @@ class AuthController {
           for (let i = 0; i < 6; i++) {
             otp = otp + digits[Math.floor(Math.random() * 10)];
           }
+
+          console.log("--------------- OTP --------------------");
           console.log(otp);
 
           const dataSendEmail = {
@@ -32,15 +35,19 @@ class AuthController {
             otp,
             url: Env.get("VUE_APP_FONTEND_URL"),
           };
+
+          console.log("--------------- DATA SEND MAIL --------------------");
           console.log(dataSendEmail);
 
           const mail = await Mail.send("login", dataSendEmail, (message) => {
             message
+              //.from("Health Care")
+              .from("bbmproject.noreply@gmail.com")
               .to(account.email)
-              .from("Health Care")
               .subject("Login to HCARE");
           });
 
+          console.log("--------------- Mail --------------------");
           console.log(mail);
 
           await Account.query()
@@ -49,9 +56,12 @@ class AuthController {
               password: await Hash.make(dataSendEmail.otp),
             });
 
-          const accountLogin = Database.select("*")
+          const accountLogin = await Database.select("*")
             .from("accounts")
-            .where("email", email);
+            .where("email", email)
+            .first();
+          console.log("--------------- New Password ------------------");
+          console.log(accountLogin);
 
           if (account.password != accountLogin.password) {
             return "send mail for login successful";

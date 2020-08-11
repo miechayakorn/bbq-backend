@@ -30,8 +30,8 @@ deploy-prod-adonis:
   except:
     - branches
   script:
-    - docker kill hcare_nginx hcare_adonis
-    - docker rm hcare_nginx hcare_adonis
+    - docker kill hcare_nginx hcare_adonis || true
+    - docker rm hcare_nginx hcare_adonis || true
     - ls -la
     - docker-compose up -d --build
   when: manual
