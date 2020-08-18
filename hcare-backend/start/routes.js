@@ -42,10 +42,20 @@ Route.group(() => {
 }).middleware(["guest"]);
 
 //staff modify
-Route.post("/servicetype/create", "BookingServiceController.create");
-Route.post("updatetype", "CreateTypeController.update");
-Route.post("createbooking/check", "CreateBookingController.checkWorktime");
-Route.post("createbooking", "CreateBookingController.store");
+Route.group(() => {
+  Route.post("/servicetype/create", "BookingServiceController.create");
+  // Route.post("updatetype", "CreateTypeController.update");
+  // Route.post("createbooking/check", "CreateBookingController.checkWorktime");
+  // Route.post("createbooking", "CreateBookingController.store");
+  Route.post(
+    "/admin/dashboard/timetable/managetable/checktimeslot",
+    "ManagebookingController.CheckTimeslot"
+  );
+  Route.post(
+    "/admin/dashboard/timetable/managetable/savetimeslot",
+    "ManagebookingController.CreateTimeslot"
+  );
+}).middleware(["auth"]);
 
 //for booking feature
 Route.get("/ServiceTypes", "BookingController.showType");
@@ -84,6 +94,7 @@ Route.group(() => {
     "DashboardBookingController.submitBookingFromHealthcare"
   );
 }).middleware(["auth"]);
+
 Route.post("/cancel", "DashboardBookingController.cancelAppointment");
 
 //Route.get("/patientbooking/detail/:booking_id", "BookingController.patientDetail");

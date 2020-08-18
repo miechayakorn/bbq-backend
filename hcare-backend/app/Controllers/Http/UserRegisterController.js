@@ -22,7 +22,6 @@ class UserRegisterController {
     console.log(data);
     try {
       await validateAll(data, RegisterRules);
-
       const accountUser = await Account.create({
         // password: data.password,
         hn_number: data.hn_number,
@@ -51,8 +50,8 @@ class UserRegisterController {
           dataForSendEmail,
           (message) => {
             message
+              .from("bbmproject.noreply@gmail.com")
               .to(dataForSendEmail.account.email)
-              .from("Mail from healthcare")
               .subject("Activate Register From Health Care");
           }
         );

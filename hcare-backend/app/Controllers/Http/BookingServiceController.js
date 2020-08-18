@@ -3,6 +3,7 @@ const ServiceType = use("App/Models/ServiceType");
 const Database = use("Database");
 
 class BookingServiceController {
+  //สร้าง service ใหม่
   async create({ request, response }) {
     try {
       const data = await request.only(["type_name"]);
@@ -23,7 +24,14 @@ class BookingServiceController {
       return response.status(error.status).send(error);
     }
   }
-    
+
+  async create_service({ request, response }) {
+    try {
+      
+    }
+  }
+  
+  //แก้ไข service ใหม่
   async update({ request, response }) {
       let data = await request.only([
         "type_id",

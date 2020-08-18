@@ -91,6 +91,25 @@ class DateService {
     }
     return month;
   };
+
+  static dateToDay = (day) => {
+    
+    if (day == 0) {
+      return "SUNDAY";
+    } else if (day == 1) {
+      return "MONDAY";
+    } else if (day == 2) {
+      return "TUESDAY";
+    } else if (day == 3) {
+      return "WEDNESDAY";
+    } else if (day == 4) {
+      return "THURSDAY";
+    } else if (day == 5) {
+      return "FRIDAY";
+    } else if (day == 6) {
+      return "SATURDAY";
+    }
+  };
 }
 
 module.exports = DateService;
