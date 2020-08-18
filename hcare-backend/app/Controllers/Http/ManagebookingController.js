@@ -2,8 +2,11 @@
 const Database = use("Database");
 const Env = use("Env");
 const DateService = use("App/Service/DateService");
+const CreateSlotRules = use("App/Validators/CreateSlotBooking");
+const { validateAll } = use("Validator");
 
 class ManagebookingController {
+  //รับ type และวันที่หาช่วงเวลาทำงานเพื่อนำไปเพิ่ม slot
   async CheckTimeslot({ request, response }) {
     try {
       const { type_id, date } = request.only(["type_id", "date"]);
@@ -46,6 +49,26 @@ class ManagebookingController {
         date: date,
         timeArray: timeArray,
       });
+    } catch (error) {
+      return response.status(error.status).send(error);
+    }
+  }
+
+  // บันทึกการสร้าง slot เวลาใหม่
+  async CreateTimeslot({ request, response, auth }) {
+    try {
+      const account = await auth.getUser();
+      //console.log(account);
+      if (account.role == STAFF || account.role == ADMIN) {
+        const { type_id, date, time_slot } = await request.only([
+          type_id,
+          date,
+          time_slot,
+        ]);
+        await validateAll({ type_id, date }, CreateSlotRules);
+      } else {
+        return response.status(403).send("Forbidden");
+      }
     } catch (error) {
       return response.status(error.status).send(error);
     }
