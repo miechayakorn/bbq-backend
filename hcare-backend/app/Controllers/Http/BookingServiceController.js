@@ -24,12 +24,6 @@ class BookingServiceController {
       return response.status(error.status).send(error);
     }
   }
-
-  async create_service({ request, response }) {
-    try {
-      
-    }
-  }
   
   //แก้ไข service ใหม่
   async update({ request, response }) {

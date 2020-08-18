@@ -27,10 +27,10 @@ class ManagebookingController {
       console.log("end " + end);
       console.log("round " + round);
 
-      let dateArray = [];
+      let timeArray = [];
 
       for (let i = 0; i < round; i++) {
-        dateArray.push(time_count);
+        timeArray.push(time_count);
         time_count = new Date(
           new Date("1970/01/01 " + time_count).getTime() + minsToAdd * 60000
         ).toLocaleTimeString("en-UK", {
@@ -40,7 +40,12 @@ class ManagebookingController {
           hour12: false,
         });
       }
-      console.log(dateArray);
+      console.log(timeArray);
+      return response.json({
+        type_id: type_id,
+        date: date,
+        timeArray: timeArray,
+      });
     } catch (error) {
       return response.status(error.status).send(error);
     }
