@@ -12,7 +12,7 @@ test:
   stage: test
   only:
     - merge_requests
-  script: cat .env
+  script: cat .env.docker
 
 # build-push-image:
 #   stage: build_push
