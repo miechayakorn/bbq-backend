@@ -15,7 +15,6 @@ test:
   only:
     - merge_requests
   script: 
-    - cat .env.docker
     - docker build --pull --no-cache -t $CI_REGISTRY_IMAGE:develop .
     - docker run -d -p 33972:3333 --name hcare_adonis-dev --env-file .env --restart=always $CI_REGISTRY_IMAGE:develop
 
