@@ -7,13 +7,17 @@ before_script:
   - cd hcare-backend/
   - chmod +x ./init.sh
   - ./init.sh
+  - mv .env.docker .env
   # - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
 
 test:
   stage: test
   only:
     - merge_requests
-  script: cat .env.docker
+  script: 
+    - cat .env.docker
+    - docker build --pull --no-cache -t $CI_REGISTRY_IMAGE:develop .
+    - docker run -d -p 33972:3333 --name hcare_adonis-dev --env-file .env --restart=always $CI_REGISTRY_IMAGE:develop
 
 # build-push-image:
 #   stage: build_push
