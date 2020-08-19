@@ -13,7 +13,7 @@ test:
   stage: test
   only:
     - merge_requests
-  script: cat ./hcare-backend/.env.docker
+  script: cat .env.docker
 
 # build-push-image:
 #   stage: build_push
