@@ -15,10 +15,18 @@ test:
   only:
     - merge_requests
   script: 
-    - docker kill hcare_adonis-dev || true
-    - docker rm hcare_adonis-dev || true
-    - docker build --pull --no-cache -t $CI_REGISTRY_IMAGE:develop .
-    - docker run -d -p 33972:3333 --name hcare_adonis-dev --env-file .env --restart=always $CI_REGISTRY_IMAGE:develop
+    # - docker kill hcare_adonis-dev || true
+    # - docker rm hcare_adonis-dev || true
+    # - docker build --pull --no-cache -t $CI_REGISTRY_IMAGE:develop .
+    # - docker run -d -p 33972:3333 --name hcare_adonis-dev --env-file .env --restart=always $CI_REGISTRY_IMAGE:develop
+    - docker kill hcare_adonis || true
+    - docker rm hcare_adonis || true
+    - docker build --pull --no-cache -t $CI_REGISTRY_IMAGE:master .
+    - docker run -d -p 33971:3333 --name hcare_adonis --env-file .env --restart=always $CI_REGISTRY_IMAGE:master
+
+
+
+
 
 # build-push-image:
 #   stage: build_push
