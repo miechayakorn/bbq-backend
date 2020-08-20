@@ -52,7 +52,7 @@ services:
     image: phpmyadmin/phpmyadmin
     container_name: hcare_pma_dev
     links:
-      - mysql
+      - mysql-dev
     environment:
       PMA_HOST: mysql
       PMA_PORT: 3306
