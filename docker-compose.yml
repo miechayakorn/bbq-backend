@@ -6,7 +6,7 @@ services:
   ##### My SQL #####################################
   mysql:
     image: mysql:5.7
-    container_name: hcare_mysql
+    container_name: hcare_mysql_master
     environment:
       MYSQL_DATABASE: $MYSQL_DATABASE
       MYSQL_USER: $MYSQL_USER
@@ -20,12 +20,12 @@ services:
   ##### PHPMYADMIN #####################################
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: hcare_pma
+    container_name: hcare_pma_master
     links:
       - mysql
     environment:
       PMA_HOST: mysql
-      PMA_PORT: 3306
+      PMA_PORT: 33069
       PMA_ARBITRARY: 1
     restart: always
     ports:
@@ -55,7 +55,7 @@ services:
       - mysql-dev
     environment:
       PMA_HOST: mysql
-      PMA_PORT: 3306
+      PMA_PORT: 33068
       PMA_ARBITRARY: 1
     restart: always
     ports:
