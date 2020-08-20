@@ -34,7 +34,7 @@ services:
 ##################################### DEVELOP #####################################
 
   ##### My SQL #####################################
-  mysql:
+  mysql-dev:
     image: mysql:5.7
     container_name: hcare_mysql_dev
     environment:
@@ -48,7 +48,7 @@ services:
       - 33068:3306
 
   ##### PHPMYADMIN #####################################
-  phpmyadmin:
+  phpmyadmin-dev:
     image: phpmyadmin/phpmyadmin
     container_name: hcare_pma_dev
     links:
@@ -62,36 +62,3 @@ services:
       - 8098:80
 
 ##########################################################################
-
-
-
-
-
-  # ##### NGINX #####################################
-  # nginx:
-  #   image: nginx:1.17.8-alpine
-  #   container_name: hcare_nginx
-  #   ports:
-  #     - 80:80
-  #   volumes:
-  #     - ./nginx:/etc/nginx
-  #     - ./www/:/usr/share/nginx/html
-  #   restart: always
-
- # ##### ADONIS #####################################
-  # adonis:
-  #   build: ./hcare-backend
-  #   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
-  #   container_name: hcare_adonis
-  #   ports:
-  #     - 3333:3333
-    # environment:
-    #   - APP_KEY=$APP_KEY
-    #   - DB_USER=$MYSQL_USER
-    #   - DB_PASSWORD=$MYSQL_PASSWORD
-    #   - DB_DATABASE=$MYSQL_DATABASE
-    #   - MAIL_USERNAME=$MAIL_USERNAME
-    #   - MAIL_PASSWORD=$MAIL_PASSWORD
-    #   - VUE_APP_FONTEND_URL=$VUE_APP_FONTEND_URL
-    #   - VUE_APP_BACKEND_URL=$VUE_APP_BACKEND_URL
-  #   restart: always
