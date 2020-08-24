@@ -24,6 +24,7 @@ class BookingSchema extends Schema {
       table.integer("account_id_from_staff"); // [FK]
       table.integer("account_id_from_user"); // [FK]
       table.integer("working_id"); // [FK]
+      table.string("key_slot", 20).notNullable().unique();
       table.timestamps();
     });
   }
