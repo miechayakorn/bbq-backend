@@ -1,48 +1,60 @@
 stages:
-  - test
-  # - build_push
+  - build
   - deploy
+  - tags_push
 
-# before_script:
-#   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
+before_script:
+  - cd hcare-backend/
+  - chmod +x ./init.sh
+  - ./init.sh
+  - mv .env.docker .env
 
-test:
-  stage: test
+##########  -  develop  -  ##########
+build-image-develop:
+  stage: build
   only:
     - develop
-  script: echo "Running tests here!!"
+  script:
+    - docker build --pull --no-cache -t $CI_REGISTRY_IMAGE:develop .
 
-# build-push-image:
-#   stage: build_push
-#   only:
-#     - tags
-#   except:
-#     - branches
-#   script:
-#     - docker-compose build adonis
-#     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
-#     - "Build Adonis is done"
-
-deploy-prod-adonis:
+deploy-develop:
   stage: deploy
+  only:
+    - develop
+  script:
+    - docker rm -f hcare_adonis-dev || true
+    - docker run -d -p 33972:3333 --name hcare_adonis-dev --env-file .env --restart=always $CI_REGISTRY_IMAGE:develop
+  when: manual
+
+##########  -  master  -  ##########
+build-image-master:
+  stage: build
+  only:
+    - master
+  script:
+    - docker build --pull --no-cache -t $CI_REGISTRY_IMAGE:latest .
+
+deploy-master:
+  stage: deploy
+  only:
+    - master
+  script:
+    - docker rm -f hcare_adonis || true
+    - docker run -d -p 33971:3333 --name hcare_adonis --env-file .env --restart=always $CI_REGISTRY_IMAGE:latest
+  when: manual
+
+##########  -  tag  -  ##########
+tags-push-image:
+  stage: tags_push
   only:
     - tags
   except:
     - branches
   script:
-    - docker kill hcare_nginx hcare_adonis || true
-    - docker rm hcare_nginx hcare_adonis || true
-    - ls -la
-    - docker-compose up -d --build
-  when: manual
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
+    - docker build --pull --no-cache -t $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
 
-# deploy-prod-all:
-#   stage: deploy
-#   only:
-#     - master
-#   script:
-#     - docker-compose up -d --build
-#   when: manual
 
 after_script:
   - docker ps

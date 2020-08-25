@@ -1,24 +1,12 @@
 version: "3.1"
 services:
-  ### NGINX #####################################
-  nginx:
-    image: nginx:1.17.8-alpine
-    container_name: hcare_nginx
-    ports:
-      - 80:80
-    volumes:
-      - ./nginx:/etc/nginx
-      - ./www/:/usr/share/nginx/html
-    restart: always
-    networks:
-      - api-network
 
-  ### My SQL #####################################
+##################################### MASTER #####################################
+
+  ##### My SQL #####################################
   mysql:
     image: mysql:5.7
-    container_name: hcare_mysql
-    ports:
-      - 3306:3306
+    container_name: hcare_mysql_master
     environment:
       MYSQL_DATABASE: $MYSQL_DATABASE
       MYSQL_USER: $MYSQL_USER
@@ -26,42 +14,51 @@ services:
       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
       TZ: Asia/Bangkok
     restart: always
-    networks:
-      - api-network
-
-  ### ADONIS #####################################
-  adonis:
-    build: ./hcare-backend
-    image: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
-    container_name: hcare_adonis
     ports:
-      - 3333:3333
-    environment:
-      - APP_KEY=$APP_KEY
-      - DB_USER=$MYSQL_USER
-      - DB_PASSWORD=$MYSQL_PASSWORD
-      - DB_DATABASE=$MYSQL_DATABASE
-      - MAIL_USERNAME=$MAIL_USERNAME
-      - MAIL_PASSWORD=$MAIL_PASSWORD
-      - VUE_APP_FONTEND_URL=$VUE_APP_FONTEND_URL
-      - VUE_APP_BACKEND_URL=$VUE_APP_BACKEND_URL
-    restart: always
-    networks:
-      - api-network
+      - 33069:3306
 
-  ### PHPMYADMIN #####################################
+  ##### PHPMYADMIN #####################################
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: hcare_pma
+    container_name: hcare_pma_master
     links:
       - mysql
     environment:
       PMA_HOST: mysql
-      PMA_PORT: 3306
+      PMA_PORT: 33069
       PMA_ARBITRARY: 1
     restart: always
     ports:
-      - 8183:80
+      - 8099:80
 
-networks:
-  api-network:
+##################################### DEVELOP #####################################
+
+  ##### My SQL #####################################
+  mysql-dev:
+    image: mysql:5.7
+    container_name: hcare_mysql_dev
+    environment:
+      MYSQL_DATABASE: $MYSQL_DATABASE
+      MYSQL_USER: $MYSQL_USER
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      TZ: Asia/Bangkok
+    restart: always
+    ports:
+      - 33068:3306
+
+  ##### PHPMYADMIN #####################################
+  phpmyadmin-dev:
+    image: phpmyadmin/phpmyadmin
+    container_name: hcare_pma_dev
+    links:
+      - mysql-dev
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 33068
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8098:80
+
+##########################################################################
